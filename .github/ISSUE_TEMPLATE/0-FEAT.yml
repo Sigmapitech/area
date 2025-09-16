@@ -1,6 +1,6 @@
 name: Create a new feature request
-title: "[Feature]: description"
-description: describe the feature here
+title: "Quick description"
+description: request a new feature here
 type: feature
 projects: "Sigmapitech/9"
 body:
