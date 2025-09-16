@@ -28,9 +28,52 @@
     );
 
     devShells = forAllSystems (pkgs: {
-      default = pkgs.mkShell {
-        inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
-      };
+      default = let
+        py-env = pkgs.python3.withPackages (p:
+          with p;
+            [
+              aiocache
+              aiohttp
+              aiosqlite
+              bcrypt
+              email-validator
+              fastapi
+              fastapi-cli
+              httpx
+              passlib
+              pydantic
+              pydantic-settings
+              pyjwt
+              python-dotenv
+              python-multipart
+              sqlmodel
+              uvicorn
+            ]
+            ++ [
+              black
+              isort
+              ruff
+            ]);
+      in
+        pkgs.mkShell {
+          inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
+
+          packages = let
+            front-deps = with pkgs; [
+              eslint
+              nodejs
+              typescript
+              biome
+              vite
+            ];
+
+            back-deps = [
+              py-env
+              pkgs.pyright
+            ];
+          in
+            front-deps ++ back-deps;
+        };
     });
   };
 }
