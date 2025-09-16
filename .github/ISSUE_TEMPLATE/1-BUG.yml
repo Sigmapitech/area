@@ -1,6 +1,6 @@
 name: Create a new bug report
-title: "[Bug]: description"
-description: describe the bug here
+title: "Quick description"
+description: report a new bug here
 type: bug
 projects: "Sigmapitech/9"
 body:
