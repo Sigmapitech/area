@@ -1,7 +1,6 @@
 name: Create a new feature request
 title: "Quick description"
 description: request a new feature here
-type: feature
 projects: "Sigmapitech/9"
 body:
   - type: textarea
@@ -27,9 +26,11 @@ body:
       label: Pre-submission checklist
       description: "Please ensure you have completed the following before submitting your feature request:"
       options:
-        - label: I have set the apropriate label
+        - label: I have SET the apropriate label
           required: true
-        - label: I have set the apropriate milestone
+        - label: I have SET the apropriate milestone
+          required: true
+        - label: I have UNSET the issue tag
           required: true
     validations:
       required: true

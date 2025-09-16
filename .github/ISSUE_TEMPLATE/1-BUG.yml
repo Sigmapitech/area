@@ -1,7 +1,6 @@
 name: Create a new bug report
 title: "Quick description"
 description: report a new bug here
-type: bug
 projects: "Sigmapitech/9"
 body:
   - type: input
@@ -21,8 +20,6 @@ body:
         1. Go to '...'
         2. Click on '....'
         3. Scroll down to '....'
-    validations:
-      required: true
   - type: input
     attributes:
       label: Expected behavior
@@ -44,9 +41,11 @@ body:
       label: Pre-submission checklist
       description: "Please ensure you have completed the following before submitting your bug report:"
       options:
-        - label: I have set the apropriate label
+        - label: I have SET the apropriate label
           required: true
-        - label: I have set the apropriate milestone
+        - label: I have SET the apropriate milestone
+          required: true
+        - label: I have UNSET the issue tag
           required: true
     validations:
       required: true
