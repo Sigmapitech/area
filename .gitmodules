@@ -1,0 +1,3 @@
+[submodule "area-techno-tester"]
+	path = area-techno-tester
+	url = git@github.com:Sigmapitech/area-techno-tester.git
