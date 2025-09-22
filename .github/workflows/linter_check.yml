@@ -21,19 +21,18 @@ jobs:
 
       - name: Run linters
         run: |
-            nix-shell -p biome black --run "bash <<'EOF'
-            set -o pipefail
+          nix-shell -p biome black --run "bash <<'EOF'
+          set -o pipefail
 
-            echo Running Biome...
-            biome check .
-            BIOME_EXIT=$?
+          echo Running Biome...
+          biome check .
 
-            echo Running Black...
-            black --check .
-            BLACK_EXIT=$?
+          echo Running Black...
+          black --check .
 
-            if [ $BIOME_EXIT -ne 0 ] || [ $BLACK_EXIT -ne 0 ]; then
-                echo 'One or more linters failed.'
-                exit 1
-            fi
-            EOF"
+          if ! biome check . || ! black --check .; then
+              echo 'One or more linters failed.'
+              exit 1
+          fi
+          EOF
+          "
