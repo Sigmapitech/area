@@ -1,0 +1,39 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-24.05
+
+      - name: Run linters
+        run: |
+            nix-shell -p biome black --run "bash <<'EOF'
+            set -o pipefail
+
+            echo Running Biome...
+            biome check .
+            BIOME_EXIT=$?
+
+            echo Running Black...
+            black --check .
+            BLACK_EXIT=$?
+
+            if [ $BIOME_EXIT -ne 0 ] || [ $BLACK_EXIT -ne 0 ]; then
+                echo 'One or more linters failed.'
+                exit 1
+            fi
+            EOF"
