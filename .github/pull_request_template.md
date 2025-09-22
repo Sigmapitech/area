@@ -1,33 +1,35 @@
-# Feature Addition PR Template - RENAME_ME
+# Feature Addition PR Template Name - RENAME_ME
+<!-- verb(scope): description -->
 
 ## Issues closed
-Write here which issues have been closed:
-Closes #xxx
+<!-- Write here which issues have been closed: -->
+Closes #xx
 
 ## Summary
-Briefly describe the feature being introduced.
+<!-- Briefly describe the feature being introduced. -->
 
 ## Changes
-List the major changes made in this pull request.
+<!-- List the major changes made in this pull request. -->
 
 ## Breaking changes
-- [ ] This code contains breaking changes
+- [ ] This code contains breaking changes:
+<!-- breaking changes goes below -->
 ```
-breaking changes goes here
 ```
 
 ## Screenshots/Video
-Include screenshots or video demonstrating the new feature, if applicable.
+<!-- Include screenshots or video demonstrating the new feature, if applicable. -->
+
+## Additional Notes
+<!-- Any additional information or context relevant to this PR. -->
+<!-- Remove this part otherwise -->
 
 ## Checklist
 - [ ] I have renamed the first header of the template -_-
 - [ ] I have tested my modifications
 - [ ] I have done the relevant documentation
 - [ ] I have set the Reviewers & Assignees
-- [ ] I have set the correct labels
+- [ ] I have set the correct `Labels`
 - [ ] I have set the `area` project
-- [ ] I have set Status / Priority / Size / Start date / End date
-- [ ] I have set the relevant
-
-## Additional Notes
-Any additional information or context relevant to this PR.
+- [ ] I have set `Status` / `Priority` / `Size` / `Start date` / `End date`
+- [ ] I have set the relevant `Milestone`
