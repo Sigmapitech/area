@@ -1,5 +1,5 @@
-from contextlib import asynccontextmanager
 import sys
+from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI

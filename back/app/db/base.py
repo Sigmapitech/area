@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -5,11 +6,18 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = "sqlite+aiosqlite:///app.db"
+from ..config import get_package_config
+
+
+class Config(BaseModel):
+    uri: str
+
+
+settings = get_package_config(__package__, Config)
 
 Base = declarative_base()
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(settings.uri, echo=True)
 
 async_session = async_sessionmaker(
     bind=engine,
