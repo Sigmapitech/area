@@ -4,9 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm vite",
-    "build": "pnpm tsc -b && pnpm vite build"
+    "build:web": "vite build --mode web",
+    "build:mobile": "vite build --mode mobile && npx cap sync android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
