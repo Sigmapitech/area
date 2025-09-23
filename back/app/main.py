@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import sys
 
 import uvicorn
@@ -5,11 +6,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.routes import routers
+from .db import init_db
 
 app = FastAPI(docs_url="/docs")
 
 for router in routers:
     app.include_router(router, prefix="/api")
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await init_db()
+    yield
 
 
 if "dev" in sys.argv:
