@@ -38,7 +38,9 @@
             };
           }
           // pkgs.lib.genAttrs [
+            "black"
             "convco"
+            "isort"
             "trim-trailing-whitespace"
             "deadnix"
           ] (_: {enable = true;});
@@ -48,6 +50,11 @@
 
     devShells = forAllSystems (pkgs: let
       compo = self.packages.${pkgs.system}.android-composition;
+
+      py-env = pkgs.python3.withPackages (_:
+        with self.packages.${pkgs.system}.back;
+          dependencies ++ optional-dependencies.dev
+      );
     in {
       base = pkgs.mkShell {
         inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
@@ -58,6 +65,7 @@
           pnpm
           jdk
           gradle
+          py-env
         ];
       };
 
@@ -95,6 +103,8 @@
 
     packages = forAllSystems (pkgs: {
       android-composition = pkgs.callPackage ./front/android/composition.nix { };
+
+      back = pkgs.callPackage ./back { };
     });
   };
 }
