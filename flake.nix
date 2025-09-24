@@ -49,10 +49,8 @@
     devShells = forAllSystems (pkgs: let
       compo = self.packages.${pkgs.system}.android-composition;
     in {
-      default = pkgs.mkShell {
+      base = pkgs.mkShell {
         inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
-
-        env.ANDROID_SDK_ROOT = "${compo.androidsdk}/libexec/android-sdk";
 
         packages = with pkgs; [
           biome
@@ -60,7 +58,15 @@
           pnpm
           jdk
           gradle
-        ] ++ (with compo; [
+        ];
+      };
+
+      default = pkgs.mkShell {
+        inputsFrom = [ self.devShells.${pkgs.system}.base ];
+
+        env.ANDROID_SDK_ROOT = "${compo.androidsdk}/libexec/android-sdk";
+
+        packages = (with compo; [
           androidsdk
           platform-tools
           build-tools
@@ -71,15 +77,19 @@
         compo' = compo.override {
           includeEmulator = true;
           includeSystemImages = true;
+          abiVersions = [ "x86_64" ];
+          systemImageTypes = [ "google_apis" ];
         };
       in pkgs.mkShell {
-        inputsFrom = [ self.devShells.${pkgs.system}.default ];
+        inputsFrom = [ self.devShells.${pkgs.system}.base ];
 
         env.ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
 
-        packages = with compo'; [
+        packages = (with compo'; [
+          androidsdk
           emulator
-        ];
+          platform-tools
+        ]);
       };
     });
 

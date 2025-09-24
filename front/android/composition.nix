@@ -8,7 +8,7 @@
   platformVersions ? [ "34" "35" ],
 
   systemImageTypes ? [ "google_apis" ],
-  abiVersions ? [ "arm64-v8a" "x86_64" ],
+  abiVersions ? [ "arm64-v8a" ],
 
   extraLicenses ? [
     "android-sdk-preview-license"
