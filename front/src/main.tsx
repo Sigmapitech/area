@@ -1,12 +1,22 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-
 import "./index.scss";
-import App from "./App.tsx";
 
-// biome-ignore lint: root node existence is granted
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+import MobileApp from "./mobile/entrypoint";
+import WebApp from "./web/entrypoint";
+
+import { createRoot } from "react-dom/client";
+import { StrictMode } from "react";
+
+// biome-ignore lint: root node is granted
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
+  __APP_PLATFORM__ === "web" ? (
+    <StrictMode>
+      <WebApp />
+    </StrictMode>
+  ) : (
+    <StrictMode>
+      <MobileApp />
+    </StrictMode>
+  )
 );
