@@ -47,35 +47,12 @@
     );
 
     devShells = forAllSystems (pkgs: let
-      sdkArgs = {
-        includeNDK = false;
-        includeSystemImages = false;
-        includeEmulator = false;
-
-        buildToolsVersions = [ "34.0.0" ];
-        platformVersions = [ "34" "35" ];
-
-        systemImageTypes = [ "google_apis" ];
-        abiVersions = [ "arm64-v8a" "x86_64" ];
-
-        extraLicenses = [
-          "android-sdk-preview-license"
-          "android-googletv-license"
-          "android-sdk-arm-dbt-license"
-          "google-gdk-license"
-          "intel-android-extra-license"
-          "intel-android-sysimage-license"
-          "mips-android-sysimage-license"
-        ];
-      };
-
-      androidComposition = pkgs.androidenv.composeAndroidPackages sdkArgs;
-      androidSdk = androidComposition.androidsdk;
+      compo = self.packages.${pkgs.system}.android-composition;
     in {
       default = pkgs.mkShell {
         inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
 
-        env.ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+        env.ANDROID_SDK_ROOT = "${compo.androidsdk}/libexec/android-sdk";
 
         packages = with pkgs; [
           biome
@@ -83,12 +60,31 @@
           pnpm
           jdk
           gradle
-        ] ++ (with androidComposition; [
+        ] ++ (with compo; [
           androidsdk
           platform-tools
           build-tools
         ]);
       };
+
+      with-emulator = let
+        compo' = compo.override {
+          includeEmulator = true;
+          includeSystemImages = true;
+        };
+      in pkgs.mkShell {
+        inputsFrom = [ self.devShells.${pkgs.system}.default ];
+
+        env.ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
+
+        packages = with compo'; [
+          emulator
+        ];
+      };
+    });
+
+    packages = forAllSystems (pkgs: {
+      android-composition = pkgs.callPackage ./front/android/composition.nix { };
     });
   };
 }
