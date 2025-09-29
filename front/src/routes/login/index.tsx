@@ -34,9 +34,9 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-            login(data.token);
+      login(data.token);
       navigate("/");
-    } catch (err:any) {
+    } catch (err) {
       setError(err?.message);
     }
   };
