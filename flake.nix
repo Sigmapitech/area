@@ -103,6 +103,12 @@
 
     packages = forAllSystems (pkgs: {
       back = pkgs.callPackage ./back { };
+
+      front = pkgs.callPackage ./front { };
+
+      mobile = pkgs.callPackage ./front/android {
+        front = self.packages.${pkgs.system}.front.override { mode = "mobile"; };
+      };
     });
   };
 }
