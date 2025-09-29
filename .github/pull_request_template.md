@@ -19,6 +19,7 @@ Closes #xx
 
 ## Screenshots/Video
 <!-- Include screenshots or video demonstrating the new feature, if applicable. -->
+<!-- Remove this part otherwise -->
 
 ## Additional Notes
 <!-- Any additional information or context relevant to this PR. -->
