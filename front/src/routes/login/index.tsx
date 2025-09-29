@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import "./auth.scss";
 import { useAuth } from "@/auth";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_BASE_URL } from "@/api_url";
 
 export default function LoginPage() {
   const { login } = useAuth();

@@ -4,7 +4,7 @@ import "./style.scss";
 import { Link } from "react-router";
 import { useAuth } from "@/auth";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_BASE_URL } from "@/api_url";
 
 function getPopupDimension() {
   const width = 500;
