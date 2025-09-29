@@ -12,6 +12,8 @@
       "**",
       "!.git",
       "!.direnv",
+      "!android/app/build",
+      "!android/app/src/main/assets",
       "!node_modules",
       "!dist",
       "!venv",

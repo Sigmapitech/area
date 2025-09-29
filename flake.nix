@@ -49,7 +49,7 @@
     );
 
     devShells = forAllSystems (pkgs: let
-      compo = self.packages.${pkgs.system}.android-composition;
+      compo = pkgs.callPackage ./front/android/composition.nix { };
 
       py-env = pkgs.python3.withPackages (_:
         with self.packages.${pkgs.system}.back;
@@ -102,8 +102,6 @@
     });
 
     packages = forAllSystems (pkgs: {
-      android-composition = pkgs.callPackage ./front/android/composition.nix { };
-
       back = pkgs.callPackage ./back { };
     });
   };
