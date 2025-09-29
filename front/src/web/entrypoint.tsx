@@ -10,17 +10,17 @@ import LoginPage from "@/routes/login";
 
 function WebApp() {
   return (
-  <AuthProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<LoginRequired />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/graph" element={<GraphPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  </AuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<LoginRequired />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/graph" element={<GraphPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

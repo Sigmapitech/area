@@ -14,8 +14,10 @@
       "!.direnv",
       "!android/app/build",
       "!android/app/src/main/assets",
+      "!assets",
       "!node_modules",
       "!dist",
+      "!result",
       "!venv",
       "!.pre-commit-config.yaml"
     ]
