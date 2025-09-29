@@ -1,0 +1,99 @@
+.auth {
+  width: 28rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 1em;
+
+  &-header {
+    display: flex;
+    gap: 1.2em;
+    align-items: center;
+
+    a {
+      font-size: 1.5rem;
+    }
+
+    h1 {
+      color: #fff;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 1px;
+      padding: 1rem 2rem;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+      text-align: center;
+      text-wrap: nowrap;
+    }
+  }
+
+  form, input {
+     box-sizing: border-box;
+  }
+
+  form {
+    display: grid;
+    padding: max(2em, 24px);
+    margin-bottom: 20px;
+    background: #17181a;
+    border: 1px solid black;
+    grid-gap: 2em;
+
+    border: 1px solid #fff;
+
+    & + a {
+      font-size: 1rem;
+    }
+  }
+
+  label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #96bfff;
+    display: flex;
+    flex-flow: row wrap;
+    grid-gap: 2em;
+  }
+
+  input {
+    width: 100%;
+    border: 2px solid transparent;
+    padding: 6px;
+
+    &[type=text],
+    &[type=password],
+    &[type=email] {
+      background-color: #212026;
+      color: white;
+    }
+
+    &:focus, &:focus-visible {
+      border: 2px solid #96bfff;
+      outline: none;
+    }
+  }
+
+  p.error {
+    margin: 0;
+    color: #f18585;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .btn-validate {
+    background: #96bfff;
+    color: black;
+
+    &:hover {
+      background: #E4BEF8;
+    }
+  }
+
+  .actions {
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-around;
+    flex-flow: row wrap;
+    grid-gap: 2em;
+  }
+}
