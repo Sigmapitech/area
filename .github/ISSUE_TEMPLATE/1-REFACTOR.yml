@@ -28,9 +28,11 @@ body:
       options:
         - label: I have SET the apropriate label
           required: true
-        - label: I have SET the apropriate milestone
-          required: true
         - label: I have UNSET the issue tag
+          required: true
+        - label: I have SET the AREA project
+          required: true
+        - label: I have SET the apropriate milestone
           required: true
     validations:
       required: true
