@@ -151,6 +151,7 @@ class VerificationRequest(BaseModel):
     status_code=201,
     responses={
         201: {"model": AuthResponse, "description": "Account created"},
+        409: {"description": "User already exists"},
     },
 )
 async def register(
@@ -159,12 +160,7 @@ async def register(
     result = await db.execute(select(User).filter(User.email == data.email))
     collected = result.scalars().all()
     if len(collected) > 0:
-        return AuthResponse(
-            token=create_access_token(
-                {"id": collected[0].id, "email": collected[0].email},
-                timedelta(0),
-            )
-        )
+        raise HTTPException(status_code=409, detail="User already exists")
 
     user = User(
         auth=bcrypt.hash(data.password),
