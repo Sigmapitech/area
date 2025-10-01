@@ -1,0 +1,16 @@
+{
+  "root": true,
+  "extends": ["./front/biome.json"],
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!.git",
+      "!.direnv",
+      "!node_modules",
+      "!dist",
+      "!venv",
+      "!.pre-commit-config.yaml"
+    ]
+  }
+}
