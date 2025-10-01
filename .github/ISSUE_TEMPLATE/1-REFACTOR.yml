@@ -1,14 +1,14 @@
-name: Create a new feature request
+name: Create a refactor request
 title: "Quick description"
-description: request a new feature here
+description: request a refactor here
 projects: "Sigmapitech/9"
 body:
   - type: textarea
-    id: feature_description
+    id: refactor_description
     attributes:
-      label: Describe the feature
-      description: A clear and concise description of what the feature is.
-      placeholder: "ex: Add new button to the homepage."
+      label: Describe the refactor
+      description: A clear and concise description of what the refactor is.
+      placeholder: "ex: Modify the button component for better accessibility."
     validations:
       required: true
   - type: textarea
