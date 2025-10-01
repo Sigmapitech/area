@@ -12,11 +12,13 @@ python3Packages.buildPythonApplication {
   build-system = [ python3Packages.hatchling ];
 
   dependencies = with python3Packages; [
-    fastapi
-    uvicorn
-    sqlalchemy
-    passlib
     aiosqlite
+    fastapi
+    pyjwt
+    passlib
+    sqlalchemy
+    sqlmodel
+    uvicorn
   ];
 
   optional-dependencies = with python3Packages; {

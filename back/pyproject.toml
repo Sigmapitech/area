@@ -10,10 +10,12 @@ license = { text = "BSD-3-Clause" }
 requires-python = ">=3.12"
 dependencies = [
   "fastapi",
-  "uvicorn[standard]",
-  "sqlalchemy[asyncio]",
-  "pydantic",
   "passlib[bcrypt]",
+  "pydantic",
+  "pyjwt",
+  "sqlalchemy[asyncio]",
+  "sqlmodel",
+  "uvicorn[standard]",
 ]
 
 [project.scripts]
