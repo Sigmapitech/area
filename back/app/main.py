@@ -8,17 +8,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api.routes import routers
 from .db import init_db
 
-app = FastAPI(docs_url="/docs")
-
-for router in routers:
-    app.include_router(router, prefix="/api")
-
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await init_db()
     yield
 
+
+app = FastAPI(docs_url="/docs", lifespan=lifespan)
+
+for router in routers:
+    app.include_router(router, prefix="/api")
 
 if "dev" in sys.argv:
     app.add_middleware(
