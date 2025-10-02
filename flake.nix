@@ -13,7 +13,9 @@
     nixpkgs,
     git-hooks,
   }: let
-    applySystems = nixpkgs.lib.genAttrs ["x86_64-linux"];
+    inherit (nixpkgs) lib;
+
+    applySystems = lib.genAttrs ["x86_64-linux"];
     forAllSystems = f:
       applySystems (
         system:
@@ -37,11 +39,11 @@
               enable = true;
               name = "biome hook (format only)";
               entry = ''
-                ${pkgs.lib.getExe pkgs.biome} format --write ./.
+                ${lib.getExe pkgs.biome} format --write ./.
               '';
             };
           }
-          // pkgs.lib.genAttrs [
+          // lib.genAttrs [
             "black"
             "convco"
             "isort"
@@ -58,8 +60,11 @@
             pkgs.biome
           ];
         } ''
-          ${self.formatter.${pkgs.system}}/bin/alejandra --check .
-          ${pkgs.biome}/bin/biome check ${./.}
+          ${lib.getExe self.formatter.${pkgs.system}} --check .
+          ${lib.getExe pkgs.biome} check ${./.} \
+            --config-path ${./front/biome.json}
+
+          touch $out
         '';
     });
     devShells = forAllSystems (pkgs: let
