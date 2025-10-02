@@ -8,6 +8,7 @@ class Workflow(Base):
     __tablename__ = "workflows"
 
     id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(String(512), nullable=True)
 
