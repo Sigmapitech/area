@@ -9,26 +9,30 @@
   };
 
   outputs = {
-    self, nixpkgs, git-hooks
+    self,
+    nixpkgs,
+    git-hooks,
   }: let
     applySystems = nixpkgs.lib.genAttrs ["x86_64-linux"];
-    forAllSystems = f: applySystems (system:
-      f (import nixpkgs {
-        inherit system;
-        config = {
-          android_sdk.accept_license = true;
-          allowUnfree = true;
-        };
-      })
-    );
+    forAllSystems = f:
+      applySystems (
+        system:
+          f (import nixpkgs {
+            inherit system;
+            config = {
+              android_sdk.accept_license = true;
+              allowUnfree = true;
+            };
+          })
+      );
   in {
     formatter = forAllSystems (pkgs: pkgs.alejandra);
 
-    checks = forAllSystems (
-      pkgs: {
-        pre-commit-check = git-hooks.lib.${pkgs.system}.run {
-          src = ./.;
-          hooks = {
+    checks = forAllSystems (pkgs: {
+      pre-commit-check = git-hooks.lib.${pkgs.system}.run {
+        src = ./.;
+        hooks =
+          {
             biome = {
               enable = true;
               name = "biome hook (format only)";
@@ -43,17 +47,28 @@
             "isort"
             "trim-trailing-whitespace"
             "deadnix"
+            "alejandra"
           ] (_: {enable = true;});
-        };
-      }
-    );
+      };
 
+      ci-checks =
+        pkgs.runCommand "ci-checks" {
+          buildInputs = [
+            self.formatter.${pkgs.system}
+            pkgs.biome
+          ];
+        } ''
+          ${self.formatter.${pkgs.system}}/bin/alejandra --check .
+          ${pkgs.biome}/bin/biome check ${./.}
+        '';
+    });
     devShells = forAllSystems (pkgs: let
-      compo = pkgs.callPackage ./front/android/composition.nix { };
+      compo = pkgs.callPackage ./front/android/composition.nix {};
 
-      py-env = pkgs.python3.withPackages (_:
-        with self.packages.${pkgs.system}.back;
-          dependencies ++ optional-dependencies.dev
+      py-env = pkgs.python3.withPackages (
+        _:
+          with self.packages.${pkgs.system}.back;
+            dependencies ++ optional-dependencies.dev
       );
     in {
       base = pkgs.mkShell {
@@ -70,39 +85,40 @@
       };
 
       default = pkgs.mkShell {
-        inputsFrom = [ self.devShells.${pkgs.system}.base ];
+        inputsFrom = [self.devShells.${pkgs.system}.base];
 
         env.ANDROID_SDK_ROOT = "${compo.androidsdk}/libexec/android-sdk";
 
-        packages = (with compo; [
+        packages = with compo; [
           androidsdk
           platform-tools
           build-tools
-        ]);
+        ];
       };
 
       with-emulator = let
         compo' = compo.override {
           includeEmulator = true;
           includeSystemImages = true;
-          abiVersions = [ "x86_64" ];
-          systemImageTypes = [ "google_apis" ];
+          abiVersions = ["x86_64"];
+          systemImageTypes = ["google_apis"];
         };
-      in pkgs.mkShell {
-        inputsFrom = [ self.devShells.${pkgs.system}.base ];
+      in
+        pkgs.mkShell {
+          inputsFrom = [self.devShells.${pkgs.system}.base];
 
-        env.ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
+          env.ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
 
-        packages = (with compo'; [
-          androidsdk
-          emulator
-          platform-tools
-        ]);
-      };
+          packages = with compo'; [
+            androidsdk
+            emulator
+            platform-tools
+          ];
+        };
     });
 
     packages = forAllSystems (pkgs: {
-      back = pkgs.callPackage ./back { };
+      back = pkgs.callPackage ./back {};
     });
   };
 }
