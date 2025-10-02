@@ -17,7 +17,7 @@ async def get_current_user_id(
 ) -> int:
     """Temporary user identification via header.
 
-    In production, replace with proper auth and token verification.
+    In production, replace with poper auth and token verification.
     """
     if x_user_id is None:
         raise HTTPException(
