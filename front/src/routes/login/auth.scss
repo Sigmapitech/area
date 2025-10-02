@@ -1,7 +1,9 @@
 .auth {
-  width: 28rem;
+  max-width: 28rem;
+  width: 100%;
+  min-height: auto;
+  height: 100%;
   margin: 0 auto;
-  min-height: 100vh;
   box-sizing: border-box;
   padding: 1em;
 
@@ -27,13 +29,12 @@
   }
 
   form, input {
-     box-sizing: border-box;
+    box-sizing: border-box;
   }
 
   form {
     display: grid;
     padding: max(2em, 24px);
-    margin-bottom: 20px;
     background: #17181a;
     border: 1px solid black;
     grid-gap: 2em;
