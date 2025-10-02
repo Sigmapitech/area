@@ -1,6 +1,6 @@
 {
   "root": true,
-  "extends": ["./front/biome.json"],
+  "extends": ["front/biome.json"],
   "files": {
     "ignoreUnknown": true,
     "includes": [

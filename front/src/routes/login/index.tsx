@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import "./auth.scss";
-import { useAuth } from "@/auth";
 
 import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
 
 export default function LoginPage() {
   const { login } = useAuth();
