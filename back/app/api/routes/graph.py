@@ -1,29 +1,22 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ...db import get_session
 from ...db.models.graph import Workflow
-from ...schemas import WorkflowCreate, WorkflowRead, WorkflowUpdate
+from ...schemas import (
+    WorkflowCreate,
+    WorkflowDetail,
+    WorkflowRead,
+    WorkflowUpdate,
+)
+from .auth import get_user_id_from_token
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
-
-
-async def get_current_user_id(
-    x_user_id: int | None = Header(default=None),
-) -> int:
-    """Temporary user identification via header.
-
-    In production, replace with poper auth and token verification.
-    """
-    if x_user_id is None:
-        raise HTTPException(
-            HTTPStatus.UNAUTHORIZED, detail="Missing user context"
-        )
-    return x_user_id
 
 
 @router.post(
@@ -32,6 +25,7 @@ async def get_current_user_id(
     status_code=HTTPStatus.CREATED,
     responses={
         HTTPStatus.CREATED: {
+            "model": WorkflowRead,
             "content": {
                 "application/json": {
                     "example": {
@@ -40,14 +34,14 @@ async def get_current_user_id(
                         "description": "demo",
                     }
                 }
-            }
+            },
         }
     },
 )
 async def create_workflow(
     payload: WorkflowCreate,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     wf = Workflow(
         name=payload.name, description=payload.description, owner_id=user_id
@@ -67,7 +61,7 @@ async def list_workflows(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     result = await db.execute(
         select(Workflow)
@@ -81,22 +75,22 @@ async def list_workflows(
 
 @router.get(
     "/{workflow_id}",
-    response_model=WorkflowRead,
+    response_model=WorkflowDetail,
 )
 async def get_workflow(
     workflow_id: int,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     result = await db.execute(
-        select(Workflow).where(
-            Workflow.id == workflow_id, Workflow.owner_id == user_id
-        )
+        select(Workflow)
+        .where(Workflow.id == workflow_id, Workflow.owner_id == user_id)
+        .options(selectinload(Workflow.nodes))
     )
     wf = result.scalar_one_or_none()
     if wf is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
-    return WorkflowRead.model_validate(wf)
+    return WorkflowDetail.model_validate(wf)
 
 
 @router.patch(
@@ -107,7 +101,7 @@ async def patch_workflow(
     workflow_id: int,
     payload: WorkflowUpdate,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     result = await db.execute(
         select(Workflow).where(
@@ -136,7 +130,7 @@ async def update_workflow(
     workflow_id: int,
     payload: WorkflowCreate,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     result = await db.execute(
         select(Workflow).where(
@@ -161,7 +155,7 @@ async def update_workflow(
 async def delete_workflow(
     workflow_id: int,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user_id),
+    user_id: int = Depends(get_user_id_from_token),
 ):
     result = await db.execute(
         select(Workflow).where(
