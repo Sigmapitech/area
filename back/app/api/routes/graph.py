@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List
+from typing import Callable, List, Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -17,6 +17,33 @@ from ...schemas import (
 from .auth import get_user_id_from_token
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
+
+
+async def get_workflow_or_404(
+    db: AsyncSession, user_id: int, workflow_id: int, *, options: Sequence = ()
+) -> Workflow:
+    result = await db.execute(
+        select(Workflow)
+        .where(Workflow.id == workflow_id, Workflow.owner_id == user_id)
+        .options(*options)
+    )
+    wf = result.scalar_one_or_none()
+    if wf is None:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
+    return wf
+
+
+def workflow_dependency(*, options: Sequence = ()) -> Callable:
+    async def _dep(
+        workflow_id: int,
+        db: AsyncSession = Depends(get_session),
+        user_id: int = Depends(get_user_id_from_token),
+    ) -> Workflow:
+        return await get_workflow_or_404(
+            db, user_id, workflow_id, options=options
+        )
+
+    return _dep
 
 
 @router.post(
@@ -73,45 +100,21 @@ async def list_workflows(
     return [WorkflowRead.model_validate(i) for i in items]
 
 
-@router.get(
-    "/{workflow_id}",
-    response_model=WorkflowDetail,
-)
+@router.get("/{workflow_id}", response_model=WorkflowDetail)
 async def get_workflow(
-    workflow_id: int,
-    db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
+    wf: Workflow = Depends(
+        workflow_dependency(options=[selectinload(Workflow.nodes)])
+    ),
 ):
-    result = await db.execute(
-        select(Workflow)
-        .where(Workflow.id == workflow_id, Workflow.owner_id == user_id)
-        .options(selectinload(Workflow.nodes))
-    )
-    wf = result.scalar_one_or_none()
-    if wf is None:
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
     return WorkflowDetail.model_validate(wf)
 
 
-@router.patch(
-    "/{workflow_id}",
-    response_model=WorkflowRead,
-)
+@router.patch("/{workflow_id}", response_model=WorkflowRead)
 async def patch_workflow(
-    workflow_id: int,
     payload: WorkflowUpdate,
+    wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
 ):
-    result = await db.execute(
-        select(Workflow).where(
-            Workflow.id == workflow_id, Workflow.owner_id == user_id
-        )
-    )
-    wf = result.scalar_one_or_none()
-    if wf is None:
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
-
     if payload.name is not None:
         setattr(wf, "name", payload.name)
     if payload.description is not None:
@@ -122,48 +125,24 @@ async def patch_workflow(
     return WorkflowRead.model_validate(wf)
 
 
-@router.put(
-    "/{workflow_id}",
-    response_model=WorkflowRead,
-)
+@router.put("/{workflow_id}", response_model=WorkflowRead)
 async def update_workflow(
-    workflow_id: int,
     payload: WorkflowCreate,
+    wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
 ):
-    result = await db.execute(
-        select(Workflow).where(
-            Workflow.id == workflow_id, Workflow.owner_id == user_id
-        )
-    )
-    wf = result.scalar_one_or_none()
-    if wf is None:
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
-
     setattr(wf, "name", payload.name)
     setattr(wf, "description", payload.description)
+
     await db.commit()
     await db.refresh(wf)
     return WorkflowRead.model_validate(wf)
 
 
-@router.delete(
-    "/{workflow_id}",
-    status_code=HTTPStatus.NO_CONTENT,
-)
+@router.delete("/{workflow_id}", status_code=HTTPStatus.NO_CONTENT)
 async def delete_workflow(
-    workflow_id: int,
+    wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
 ):
-    result = await db.execute(
-        select(Workflow).where(
-            Workflow.id == workflow_id, Workflow.owner_id == user_id
-        )
-    )
-    wf = result.scalar_one_or_none()
-    if wf is None:
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
     await db.delete(wf)
     await db.commit()
