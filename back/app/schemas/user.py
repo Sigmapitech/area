@@ -6,6 +6,8 @@ class UserSchema(BaseModel):
     email: str
     name: str
 
+    model_config = {"from_attributes": True}
+
 
 class AuthResponse(BaseModel):
     token: str

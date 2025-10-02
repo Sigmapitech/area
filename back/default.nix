@@ -20,6 +20,7 @@ python3Packages.buildPythonApplication {
     sqlalchemy
     sqlmodel
     uvicorn
+    bcrypt
   ];
 
   optional-dependencies = with python3Packages; {
