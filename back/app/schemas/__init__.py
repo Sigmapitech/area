@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 
 from .graph import (
+    NodeCreate,
     NodeRead,
+    NodeUpdate,
     WorkflowCreate,
     WorkflowDetail,
     WorkflowRead,
@@ -23,4 +25,6 @@ __all__ = (
     "WorkflowRead",
     "WorkflowDetail",
     "NodeRead",
+    "NodeCreate",
+    "NodeUpdate",
 )

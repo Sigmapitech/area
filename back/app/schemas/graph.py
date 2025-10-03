@@ -43,3 +43,15 @@ class NodeRead(BaseModel):
     content: Optional[JsonValue] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class NodeCreate(BaseModel):
+    parent_id: Optional[int] = None
+    node_type: str
+    content: Optional[JsonValue] = None
+
+
+class NodeUpdate(BaseModel):
+    parent_id: Optional[int] = None
+    node_type: Optional[str] = None
+    content: Optional[JsonValue] = None

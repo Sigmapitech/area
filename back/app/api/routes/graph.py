@@ -5,11 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from yaml import Node
 
 from ...db import get_session
 from ...db.models.graph import Workflow, WorkflowNode
 from ...schemas import (
+    NodeCreate,
     NodeRead,
+    NodeUpdate,
     WorkflowCreate,
     WorkflowDetail,
     WorkflowRead,
@@ -181,8 +184,73 @@ async def delete_workflow(
     await db.commit()
 
 
-@router.get("/{workflow_id}/{node_id}", response_model=NodeRead)
+@router.get("/{workflow_id}/nodes/{node_id}", response_model=NodeRead)
 async def get_workflow_node(
     node: WorkflowNode = Depends(workflow_node_dependency()),
 ):
     return NodeRead.model_validate(node)
+
+
+@router.post(
+    "/{workflow_id}",
+    response_model=NodeRead,
+    status_code=HTTPStatus.CREATED,
+)
+async def create_node(
+    payload: NodeCreate,
+    wf: Workflow = Depends(workflow_dependency()),
+    db: AsyncSession = Depends(get_session),
+):
+    data = payload.model_dump(exclude_unset=True)
+    data["workflow_id"] = wf.id
+    node = WorkflowNode(**data)
+    db.add(node)
+    await db.commit()
+    await db.refresh(node)
+    return NodeRead.model_validate(node)
+
+
+@router.patch(
+    "/{workflow_id}/{node_id}",
+    response_model=NodeRead,
+)
+async def patch_node(
+    payload: NodeUpdate,
+    node: WorkflowNode = Depends(workflow_node_dependency()),
+    db: AsyncSession = Depends(get_session),
+):
+    data = payload.model_dump(exclude_unset=True)
+    for k, v in data.items():
+        setattr(node, k, v)
+    await db.commit()
+    await db.refresh(node)
+    return NodeRead.model_validate(node)
+
+
+@router.put(
+    "/{workflow_id}/{node_id}",
+    response_model=NodeRead,
+)
+async def update_node(
+    payload: NodeCreate,
+    node: WorkflowNode = Depends(workflow_node_dependency()),
+    db: AsyncSession = Depends(get_session),
+):
+    data = payload.model_dump(exclude_unset=False)
+    for k, v in data.items():
+        setattr(node, k, v)
+    await db.commit()
+    await db.refresh(node)
+    return NodeRead.model_validate(node)
+
+
+@router.delete(
+    "/{workflow_id}/{node_id}",
+    status_code=HTTPStatus.NO_CONTENT,
+)
+async def delete_node(
+    node: WorkflowNode = Depends(workflow_node_dependency()),
+    db: AsyncSession = Depends(get_session),
+):
+    await db.delete(node)
+    await db.commit()
