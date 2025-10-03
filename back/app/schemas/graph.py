@@ -34,3 +34,12 @@ class WorkflowNodeRead(BaseModel):
 
 class WorkflowDetail(WorkflowRead):
     nodes: list[WorkflowNodeRead]
+
+
+class NodeRead(BaseModel):
+    id: int
+    parent_id: Optional[int] = None
+    node_type: str
+    content: Optional[JsonValue] = None
+
+    model_config = ConfigDict(from_attributes=True)

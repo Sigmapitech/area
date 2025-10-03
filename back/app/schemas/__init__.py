@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
-from .graph import WorkflowCreate, WorkflowDetail, WorkflowRead, WorkflowUpdate
+from .graph import (
+    NodeRead,
+    WorkflowCreate,
+    WorkflowDetail,
+    WorkflowRead,
+    WorkflowUpdate,
+)
 from .user import AuthResponse, UserSchema
 
 
@@ -16,4 +22,5 @@ __all__ = (
     "WorkflowUpdate",
     "WorkflowRead",
     "WorkflowDetail",
+    "NodeRead",
 )

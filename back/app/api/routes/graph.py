@@ -1,14 +1,15 @@
 from http import HTTPStatus
 from typing import Callable, List, Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ...db import get_session
-from ...db.models.graph import Workflow
+from ...db.models.graph import Workflow, WorkflowNode
 from ...schemas import (
+    NodeRead,
     WorkflowCreate,
     WorkflowDetail,
     WorkflowRead,
@@ -33,14 +34,46 @@ async def get_workflow_or_404(
     return wf
 
 
+async def get_workflow_node_or_404(
+    db: AsyncSession, user_id: int, workflow_id: int, node_id: int
+) -> WorkflowNode:
+    result = await db.execute(
+        select(WorkflowNode)
+        .join(Workflow)
+        .where(
+            WorkflowNode.id == node_id,
+            WorkflowNode.workflow_id == workflow_id,
+            Workflow.owner_id == user_id,
+        )
+    )
+    node = result.scalar_one_or_none()
+    if node is None:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail="Node not found")
+    return node
+
+
 def workflow_dependency(*, options: Sequence = ()) -> Callable:
     async def _dep(
-        workflow_id: int,
+        workflow_id: int = Path(..., ge=1),
         db: AsyncSession = Depends(get_session),
         user_id: int = Depends(get_user_id_from_token),
     ) -> Workflow:
         return await get_workflow_or_404(
             db, user_id, workflow_id, options=options
+        )
+
+    return _dep
+
+
+def workflow_node_dependency() -> Callable:
+    async def _dep(
+        workflow_id: int = Path(..., ge=1),
+        node_id: int = Path(..., ge=1),
+        db: AsyncSession = Depends(get_session),
+        user_id: int = Depends(get_user_id_from_token),
+    ) -> WorkflowNode:
+        return await get_workflow_node_or_404(
+            db, user_id, workflow_id, node_id
         )
 
     return _dep
@@ -146,3 +179,10 @@ async def delete_workflow(
 ):
     await db.delete(wf)
     await db.commit()
+
+
+@router.get("/{workflow_id}/{node_id}", response_model=NodeRead)
+async def get_workflow_node(
+    node: WorkflowNode = Depends(workflow_node_dependency()),
+):
+    return NodeRead.model_validate(node)
