@@ -1,5 +1,5 @@
 from sqlalchemy import JSON, Column, Enum, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from ..base import Base
 
@@ -23,7 +23,11 @@ class WorkflowNode(Base):
     parent_id = Column(Integer, ForeignKey("workflow_nodes.id"), nullable=True)
 
     workflow = relationship("Workflow", back_populates="nodes")
-    parent = relationship("WorkflowNode", remote_side=[id], backref="children")
+    parent = relationship(
+        "WorkflowNode",
+        remote_side=[id],
+        backref=backref("children", cascade="all, delete-orphan"),
+    )
 
     node_type = Column(
         Enum(

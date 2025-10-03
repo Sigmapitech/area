@@ -81,39 +81,6 @@ def workflow_node_dependency() -> Callable:
     return _dep
 
 
-async def _delete_node_descendants(
-    db: AsyncSession, *, workflow_id: int, node_id: int
-) -> None:
-    """Recursively delete a node's descendants, then the node itself.
-
-    This performs a post-order traversal to avoid FK constraint issues
-    (children are deleted before their parent).
-    """
-    # Delete children first
-    res_children = await db.execute(
-        select(WorkflowNode.id).where(
-            WorkflowNode.workflow_id == workflow_id,
-            WorkflowNode.parent_id == node_id,
-        )
-    )
-    child_ids = res_children.scalars().all()
-    for cid in child_ids:
-        await _delete_node_descendants(
-            db, workflow_id=workflow_id, node_id=cid
-        )
-
-    # Then delete this node if it still exists
-    res_node = await db.execute(
-        select(WorkflowNode).where(
-            WorkflowNode.id == node_id,
-            WorkflowNode.workflow_id == workflow_id,
-        )
-    )
-    node = res_node.scalar_one_or_none()
-    if node is not None:
-        await db.delete(node)
-
-
 @router.post(
     "",
     response_model=WorkflowRead,
@@ -212,17 +179,14 @@ async def delete_workflow(
     wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    # Recursively delete all nodes in this workflow before deleting the workflow.
     res_roots = await db.execute(
-        select(WorkflowNode.id).where(
+        select(WorkflowNode).where(
             WorkflowNode.workflow_id == wf.id, WorkflowNode.parent_id.is_(None)
         )
     )
-    root_ids = res_roots.scalars().all()
-    for nid in root_ids:
-        await _delete_node_descendants(
-            db, workflow_id=cast(int, wf.id), node_id=cast(int, nid)
-        )
+    root_nodes = res_roots.scalars().all()
+    for node in root_nodes:
+        await db.delete(node)
 
     await db.delete(wf)
     await db.commit()
@@ -296,9 +260,5 @@ async def delete_node(
     node: WorkflowNode = Depends(workflow_node_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    await _delete_node_descendants(
-        db,
-        workflow_id=cast(int, node.workflow_id),
-        node_id=cast(int, node.id),
-    )
+    await db.delete(node)
     await db.commit()
