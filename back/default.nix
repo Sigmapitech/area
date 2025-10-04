@@ -9,7 +9,7 @@ python3Packages.buildPythonApplication {
 
   src = ./.;
 
-  build-system = [ python3Packages.hatchling ];
+  build-system = [python3Packages.hatchling];
 
   dependencies = with python3Packages; [
     aiosqlite
@@ -33,7 +33,7 @@ python3Packages.buildPythonApplication {
   meta = {
     description = "Modular workflow runner with FastAPI, SQLAlchemy, and MariaDB";
     license = lib.licenses.bsd3;
-    maintainers = with lib.maintainers; [ sigmanificient ];
+    maintainers = with lib.maintainers; [sigmanificient];
     mainProgram = "area";
   };
 }

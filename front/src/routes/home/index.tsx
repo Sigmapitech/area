@@ -2,9 +2,8 @@ import { StrictMode, useState } from "react";
 
 import "./style.scss";
 import { Link } from "react-router";
-import { useAuth } from "@/auth";
-
 import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
 
 function getPopupDimension() {
   const width = 500;
