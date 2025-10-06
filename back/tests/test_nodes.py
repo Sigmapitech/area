@@ -81,7 +81,5 @@ def test_delete_node(client, auth_headers, workflow):
     )
     assert resp.status_code == 204
 
-    resp = client.get(
-        f"/api/workflow/{wf_id}/nodes/{node_id}", headers=auth_headers
-    )
+    resp = client.get(f"/api/workflow/{wf_id}/{node_id}", headers=auth_headers)
     assert resp.status_code == 404
