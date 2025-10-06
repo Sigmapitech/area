@@ -1,12 +1,12 @@
 from http import HTTPStatus
-from typing import Callable, List, Sequence
+from typing import Callable, List
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from ...db import get_session
+from ...db.crud import workflows
 from ...db.models.graph import Workflow, WorkflowNode
 from ...schemas import (
     NodeCreate,
@@ -24,16 +24,13 @@ router = APIRouter(prefix="/workflow", tags=["workflow"])
 
 
 async def get_workflow_or_404(
-    db: AsyncSession, user_id: int, workflow_id: int, *, options: Sequence = ()
+    db: AsyncSession, user_id: int, workflow_id: int
 ) -> Workflow:
-    result = await db.execute(
-        select(Workflow)
-        .where(Workflow.id == workflow_id, Workflow.owner_id == user_id)
-        .options(*options)
-    )
-    wf = result.scalar_one_or_none()
-    if wf is None:
+    wf = await workflows.get_workflow(db, workflow_id)
+
+    if wf is None or getattr(wf, "owner_id") != user_id:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail="Workflow not found")
+
     return wf
 
 
@@ -55,15 +52,13 @@ async def get_workflow_node_or_404(
     return node
 
 
-def workflow_dependency(*, options: Sequence = ()) -> Callable:
+def workflow_dependency() -> Callable:
     async def _dep(
         workflow_id: int = Path(..., ge=1),
         db: AsyncSession = Depends(get_session),
         current_user: UserSchema = Depends(get_current_user),
     ) -> Workflow:
-        return await get_workflow_or_404(
-            db, current_user.id, workflow_id, options=options
-        )
+        return await get_workflow_or_404(db, current_user.id, workflow_id)
 
     return _dep
 
@@ -106,15 +101,12 @@ async def create_workflow(
     db: AsyncSession = Depends(get_session),
     current_user: UserSchema = Depends(get_current_user),
 ):
-    wf = Workflow(
+    return await workflows.create_workflow(
+        db,
         name=payload.name,
-        description=payload.description,
+        description=payload.description or "",
         owner_id=current_user.id,
     )
-    db.add(wf)
-    await db.commit()
-    await db.refresh(wf)
-    return WorkflowRead.model_validate(wf)
 
 
 @router.get(
@@ -128,23 +120,12 @@ async def list_workflows(
     db: AsyncSession = Depends(get_session),
     current_user: UserSchema = Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(Workflow)
-        .where(Workflow.owner_id == current_user.id)
-        .offset(skip)
-        .limit(limit)
-    )
-    items = result.scalars().all()
-    return [WorkflowRead.model_validate(i) for i in items]
+    return await workflows.list_workflows(db, current_user.id, skip, limit)
 
 
 @router.get("/{workflow_id}", response_model=WorkflowDetail)
-async def get_workflow(
-    wf: Workflow = Depends(
-        workflow_dependency(options=[selectinload(Workflow.nodes)])
-    ),
-):
-    return WorkflowDetail.model_validate(wf)
+async def get_workflow(wf: Workflow = Depends(workflow_dependency())):
+    return wf
 
 
 @router.patch("/{workflow_id}", response_model=WorkflowRead)
@@ -153,14 +134,7 @@ async def patch_workflow(
     wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    if payload.name is not None:
-        setattr(wf, "name", payload.name)
-    if payload.description is not None:
-        setattr(wf, "description", payload.description)
-
-    await db.commit()
-    await db.refresh(wf)
-    return WorkflowRead.model_validate(wf)
+    return await workflows.update_workflow(db, wf, **payload.model_dump())
 
 
 @router.put("/{workflow_id}", response_model=WorkflowRead)
@@ -169,12 +143,7 @@ async def update_workflow(
     wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    setattr(wf, "name", payload.name)
-    setattr(wf, "description", payload.description)
-
-    await db.commit()
-    await db.refresh(wf)
-    return WorkflowRead.model_validate(wf)
+    return await workflows.update_workflow(db, wf, **payload.model_dump())
 
 
 @router.delete("/{workflow_id}", status_code=HTTPStatus.NO_CONTENT)
@@ -182,17 +151,7 @@ async def delete_workflow(
     wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    res_roots = await db.execute(
-        select(WorkflowNode).where(
-            WorkflowNode.workflow_id == wf.id, WorkflowNode.parent_id.is_(None)
-        )
-    )
-    root_nodes = res_roots.scalars().all()
-    for node in root_nodes:
-        await db.delete(node)
-
-    await db.delete(wf)
-    await db.commit()
+    return await workflows.delete_workflow(db, wf)
 
 
 @router.get("/{workflow_id}/{node_id}", response_model=NodeRead)

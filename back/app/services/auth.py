@@ -4,8 +4,7 @@ from fastapi import Depends, HTTPException
 from passlib.hash import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.base import get_session
-
+from ..db.base import get_session
 from ..db.crud.users import create_user, get_by_email
 from ..schemas.user import AuthResponse, LoginRequest, RegisterRequest
 from ..security.jwt import create_access_token, decode_access_token
