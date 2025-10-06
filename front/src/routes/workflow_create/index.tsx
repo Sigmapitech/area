@@ -62,7 +62,10 @@ const WorkflowList = () => {
             setNewWorkflow((f) => ({ ...f, description: e.target.value }))
           }
         />
-        <button type="submit">test</button>
+        <button type="submit">Create new workflow</button>
+        {workflows?.map((workflow) => (
+          <li key={workflow.id}>{workflow.name}</li>
+        ))}
       </form>
     </>
   );
