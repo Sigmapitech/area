@@ -192,7 +192,7 @@ async def delete_workflow(
     await db.commit()
 
 
-@router.get("/{workflow_id}/nodes/{node_id}", response_model=NodeRead)
+@router.get("/{workflow_id}/{node_id}", response_model=NodeRead)
 async def get_workflow_node(
     node: WorkflowNode = Depends(workflow_node_dependency()),
 ):

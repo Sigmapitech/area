@@ -16,6 +16,7 @@ python3Packages.buildPythonApplication {
     bcrypt
     email-validator
     fastapi
+    httpx
     pyjwt
     passlib
     sqlalchemy
@@ -29,7 +30,19 @@ python3Packages.buildPythonApplication {
       black
       isort
     ];
+    testing = [
+      pytest
+      pytest-env
+      pytest-cov
+      pytest-xdist
+    ];
   };
+
+  nativeCheckInputs = with python3Packages; [
+    pytestCheckHook
+    pytest-env
+    pytest-cov-stub
+  ];
 
   meta = {
     description = "Modular workflow runner with FastAPI, SQLAlchemy, and MariaDB";

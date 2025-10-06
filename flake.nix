@@ -73,7 +73,9 @@
       py-env = pkgs.python3.withPackages (
         _:
           with self.packages.${pkgs.system}.back;
-            dependencies ++ optional-dependencies.dev
+            dependencies
+            ++ optional-dependencies.dev
+            ++ optional-dependencies.testing
       );
     in {
       base = pkgs.mkShell {
