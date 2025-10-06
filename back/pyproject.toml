@@ -12,6 +12,7 @@ dependencies = [
   "bcrypt",
   "email-validator",
   "fastapi",
+  "httpx",
   "passlib[bcrypt]",
   "pydantic",
   "pyjwt",
@@ -27,9 +28,13 @@ area = "app.main:main"
 dev = [
   "black",
   "isort",
+]
+testing = [
+  "aiosqlite",
   "pytest",
+  "pytest-cov",
   "pytest-env",
-  "pytest-cov"
+  "pytest-xdist"
 ]
 
 [tool.hatch.build.targets.wheel]

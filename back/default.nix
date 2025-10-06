@@ -29,15 +29,19 @@ python3Packages.buildPythonApplication {
       fastapi-cli
       black
       isort
+    ];
+    testing = [
       pytest
       pytest-env
       pytest-cov
+      pytest-xdist
     ];
   };
 
   nativeCheckInputs = with python3Packages; [
     pytestCheckHook
     pytest-env
+    pytest-cov-stub
   ];
 
   meta = {
