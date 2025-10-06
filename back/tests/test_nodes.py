@@ -1,3 +1,6 @@
+from http import HTTPStatus
+
+
 def test_add_nodes(client, auth_headers, workflow):
     wf_id = workflow["id"]
 
@@ -9,7 +12,7 @@ def test_add_nodes(client, auth_headers, workflow):
     resp = client.post(
         f"/api/workflow/{wf_id}", json=foo_payload, headers=auth_headers
     )
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     foo = resp.json()
 
     assert foo["id"] == 1
@@ -22,7 +25,7 @@ def test_add_nodes(client, auth_headers, workflow):
     resp = client.post(
         f"/api/workflow/{wf_id}", json=bar_payload, headers=auth_headers
     )
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     bar = resp.json()
 
     assert bar["id"] == 2
@@ -56,7 +59,7 @@ def test_connect_nodes(client, auth_headers, workflow):
         headers=auth_headers,
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     connected = resp.json()
     assert connected.get("parent_id") == foo["id"]
 
@@ -72,14 +75,14 @@ def test_delete_node(client, auth_headers, workflow):
     resp = client.post(
         f"/api/workflow/{wf_id}", json=node_payload, headers=auth_headers
     )
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     node = resp.json()
     node_id = node["id"]
 
     resp = client.delete(
         f"/api/workflow/{wf_id}/{node_id}", headers=auth_headers
     )
-    assert resp.status_code == 204
+    assert resp.status_code == HTTPStatus.NO_CONTENT
 
     resp = client.get(f"/api/workflow/{wf_id}/{node_id}", headers=auth_headers)
-    assert resp.status_code == 404
+    assert resp.status_code == HTTPStatus.NOT_FOUND
