@@ -82,7 +82,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-def get_user_id_from_token(authorization: str) -> int:
+def get_user_id_from_token(authorization: str | None = Header(None)) -> int:
     """
     Extracts the user ID from the JWT access token in the authorization header.
 
@@ -109,7 +109,10 @@ def get_user_id_from_token(authorization: str) -> int:
     return id
 
 
-async def get_user_from_token(db: AsyncSession, authorization: str) -> User:
+async def get_user_from_token(
+    db: AsyncSession = Depends(get_session),
+    authorization: str | None = Header(None),
+) -> User:
     """
     Retrieves the user associated with the JWT access token in the authorization header.
 

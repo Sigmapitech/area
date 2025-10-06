@@ -13,6 +13,7 @@ python3Packages.buildPythonApplication {
 
   dependencies = with python3Packages; [
     aiosqlite
+    bcrypt
     email-validator
     fastapi
     pyjwt
