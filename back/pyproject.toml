@@ -26,7 +26,9 @@ area = "app.main:main"
 [project.optional-dependencies]
 dev = [
   "black",
-  "isort"
+  "isort",
+  "pytest",
+  "pytest-env",
 ]
 
 [tool.hatch.build.targets.wheel]
