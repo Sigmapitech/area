@@ -29,6 +29,7 @@ dev = [
   "isort",
   "pytest",
   "pytest-env",
+  "pytest-cov"
 ]
 
 [tool.hatch.build.targets.wheel]

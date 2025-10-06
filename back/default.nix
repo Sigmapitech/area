@@ -31,6 +31,7 @@ python3Packages.buildPythonApplication {
       isort
       pytest
       pytest-env
+      pytest-cov
     ];
   };
 
