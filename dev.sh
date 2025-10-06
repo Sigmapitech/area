@@ -10,6 +10,3 @@ $(tabrun "front (mobile)" "npm run --prefix front dev:mobile")
 $(tabrun "mobile hot-reload" "cd front && npx cap run android -l --port 8082")
 EOF
 ) & disown
-
-sleep 3
-python -c "__import__('webbrowser').open('http://localhost:8081')"
