@@ -9,11 +9,11 @@ description = "A modular workflow runner with FastAPI, SQLAlchemy, and MariaDB"
 license = { text = "BSD-3-Clause" }
 requires-python = ">=3.12"
 dependencies = [
-  "bcrypt",
+  "bcrypt==4.3.0",
   "email-validator",
   "fastapi",
   "httpx",
-  "passlib[bcrypt]",
+  "passlib",
   "pydantic",
   "pyjwt",
   "sqlalchemy[asyncio]",
