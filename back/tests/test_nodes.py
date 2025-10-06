@@ -59,3 +59,29 @@ def test_connect_nodes(client, auth_headers, workflow):
     assert resp.status_code == 200
     connected = resp.json()
     assert connected.get("parent_id") == foo["id"]
+
+
+def test_delete_node(client, auth_headers, workflow):
+    wf_id = workflow["id"]
+
+    node_payload = {
+        "name": "temp_node",
+        "description": "temporary node",
+        "node_type": "receive",
+    }
+    resp = client.post(
+        f"/api/workflow/{wf_id}", json=node_payload, headers=auth_headers
+    )
+    assert resp.status_code == 201
+    node = resp.json()
+    node_id = node["id"]
+
+    resp = client.delete(
+        f"/api/workflow/{wf_id}/{node_id}", headers=auth_headers
+    )
+    assert resp.status_code == 204
+
+    resp = client.get(
+        f"/api/workflow/{wf_id}/nodes/{node_id}", headers=auth_headers
+    )
+    assert resp.status_code == 404
