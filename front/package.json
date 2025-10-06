@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:web": "vite --mode web",
-    "dev:mobile": "vite --mode mobile",
+    "dev:web": "vite --host --mode web",
+    "dev:mobile": "vite --host --mode mobile",
     "build:web": "vite build --mode web",
     "build:mobile": "vite build --mode mobile && npx cap sync android"
   },
