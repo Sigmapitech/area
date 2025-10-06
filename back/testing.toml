@@ -2,4 +2,4 @@
 jwt_secret = "dummy"
 
 [db]
-uri="sqlite+aiosqlite:///app.db"
+uri="sqlite+aiosqlite:///:memory:"
