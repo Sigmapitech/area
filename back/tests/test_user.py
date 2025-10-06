@@ -5,7 +5,10 @@ def test_user_registration(client):
         "password": "Pytest1234!",
     }
     resp = client.post("/api/auth/register/", json=new_user)
-    assert resp.status_code in (201, 409)
+    assert resp.status_code == 201
+
+    resp = client.post("/api/auth/register/", json=new_user)
+    assert resp.status_code == 409
 
 
 def test_user_login(client, registered_user):

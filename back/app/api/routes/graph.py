@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Callable, List, Sequence, cast
+from typing import Callable, List, Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
@@ -17,7 +17,8 @@ from ...schemas import (
     WorkflowRead,
     WorkflowUpdate,
 )
-from .auth import get_user_id_from_token
+from ...schemas.user import UserSchema
+from ...security.deps import get_current_user
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
 
@@ -58,10 +59,10 @@ def workflow_dependency(*, options: Sequence = ()) -> Callable:
     async def _dep(
         workflow_id: int = Path(..., ge=1),
         db: AsyncSession = Depends(get_session),
-        user_id: int = Depends(get_user_id_from_token),
+        current_user: UserSchema = Depends(get_current_user),
     ) -> Workflow:
         return await get_workflow_or_404(
-            db, user_id, workflow_id, options=options
+            db, current_user.id, workflow_id, options=options
         )
 
     return _dep
@@ -72,10 +73,10 @@ def workflow_node_dependency() -> Callable:
         workflow_id: int = Path(..., ge=1),
         node_id: int = Path(..., ge=1),
         db: AsyncSession = Depends(get_session),
-        user_id: int = Depends(get_user_id_from_token),
+        current_user: UserSchema = Depends(get_current_user),
     ) -> WorkflowNode:
         return await get_workflow_node_or_404(
-            db, user_id, workflow_id, node_id
+            db, current_user.id, workflow_id, node_id
         )
 
     return _dep
@@ -103,10 +104,12 @@ def workflow_node_dependency() -> Callable:
 async def create_workflow(
     payload: WorkflowCreate,
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
+    current_user: UserSchema = Depends(get_current_user),
 ):
     wf = Workflow(
-        name=payload.name, description=payload.description, owner_id=user_id
+        name=payload.name,
+        description=payload.description,
+        owner_id=current_user.id,
     )
     db.add(wf)
     await db.commit()
@@ -123,11 +126,11 @@ async def list_workflows(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_user_id_from_token),
+    current_user: UserSchema = Depends(get_current_user),
 ):
     result = await db.execute(
         select(Workflow)
-        .where(Workflow.owner_id == user_id)
+        .where(Workflow.owner_id == current_user.id)
         .offset(skip)
         .limit(limit)
     )
