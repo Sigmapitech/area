@@ -17,6 +17,6 @@ export default defineConfig(({ mode }) => ({
     __APP_PLATFORM__: JSON.stringify(mode),
   },
   server: {
-    port: mode == "web" ? 8081 : 8082,
+    port: mode === "web" ? 8081 : 8082,
   },
 }));
