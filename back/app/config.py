@@ -1,23 +1,39 @@
-import importlib
 import os
 import tomllib
-from types import ModuleType
 from typing import Any, Type, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+
+CONFIG_PATH = os.getenv("AREA_CONFIG_PATH", "config.toml")
 
 
-def load_config(path: str) -> dict[str, Any]:
-    """Load configuration from a TOML file."""
-    assert os.path.exists(path)
+T = TypeVar("T", bound=BaseModel)
 
-    with open(path, "rb") as f:
+
+def fire_once(func):
+    sentined = object()
+    stored = sentined
+
+    def wrapped(*args, **kwargs):
+        nonlocal stored
+
+        if stored is not sentined:
+            return stored
+
+        stored = func(*args, **kwargs)
+        return stored
+
+    return wrapped
+
+
+@fire_once
+def get_config() -> dict[str, Any]:
+    assert os.path.exists(CONFIG_PATH), f"{CONFIG_PATH} does not exist."
+
+    print(CONFIG_PATH)
+    with open(CONFIG_PATH, "rb") as f:
         config = tomllib.load(f)
     return config
-
-
-config = load_config("config.toml")
-T = TypeVar("T", bound=BaseModel)
 
 
 def get_package_config(package_name: str | None, type_: Type[T]) -> T:
@@ -33,7 +49,9 @@ def get_package_config(package_name: str | None, type_: Type[T]) -> T:
     assert package_name is not None
 
     package_layers: list[str] = package_name.removeprefix("app.").split(".")
-    cfg = config
+    cfg = get_config()
+
     for pkg in package_layers:
         cfg = cfg.get(pkg, {})
+
     return type_(**cfg)
