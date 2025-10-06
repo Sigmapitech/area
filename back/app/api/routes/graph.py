@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_session
-from ...db.crud import workflows
+from ...db.crud import workflow_nodes, workflows
 from ...db.models.graph import Workflow, WorkflowNode
 from ...schemas import (
     NodeCreate,
@@ -158,7 +158,7 @@ async def delete_workflow(
 async def get_workflow_node(
     node: WorkflowNode = Depends(workflow_node_dependency()),
 ):
-    return NodeRead.model_validate(node)
+    return node
 
 
 @router.post(
@@ -171,56 +171,36 @@ async def create_node(
     wf: Workflow = Depends(workflow_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    data = payload.model_dump(exclude_unset=True)
-    data["workflow_id"] = wf.id
-    node = WorkflowNode(**data)
-    db.add(node)
-    await db.commit()
-    await db.refresh(node)
-    return NodeRead.model_validate(node)
+    return await workflow_nodes.create_node(
+        db, getattr(wf, "id"), payload.model_dump(exclude_unset=True)
+    )
 
 
-@router.patch(
-    "/{workflow_id}/{node_id}",
-    response_model=NodeRead,
-)
+@router.patch("/{workflow_id}/{node_id}", response_model=NodeRead)
 async def patch_node(
     payload: NodeUpdate,
     node: WorkflowNode = Depends(workflow_node_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    data = payload.model_dump(exclude_unset=True)
-    for k, v in data.items():
-        setattr(node, k, v)
-    await db.commit()
-    await db.refresh(node)
-    return NodeRead.model_validate(node)
+    return await workflow_nodes.update_node(
+        db, node, payload.model_dump(exclude_unset=True)
+    )
 
 
-@router.put(
-    "/{workflow_id}/{node_id}",
-    response_model=NodeRead,
-)
+@router.put("/{workflow_id}/{node_id}", response_model=NodeRead)
 async def update_node(
     payload: NodeCreate,
     node: WorkflowNode = Depends(workflow_node_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    data = payload.model_dump(exclude_unset=False)
-    for k, v in data.items():
-        setattr(node, k, v)
-    await db.commit()
-    await db.refresh(node)
-    return NodeRead.model_validate(node)
+    return await workflow_nodes.update_node(
+        db, node, payload.model_dump(exclude_unset=True)
+    )
 
 
-@router.delete(
-    "/{workflow_id}/{node_id}",
-    status_code=HTTPStatus.NO_CONTENT,
-)
+@router.delete("/{workflow_id}/{node_id}", status_code=HTTPStatus.NO_CONTENT)
 async def delete_node(
     node: WorkflowNode = Depends(workflow_node_dependency()),
     db: AsyncSession = Depends(get_session),
 ):
-    await db.delete(node)
-    await db.commit()
+    return await workflow_nodes.delete_node(db, node)
