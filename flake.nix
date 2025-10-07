@@ -132,6 +132,8 @@
 
     packages = forAllSystems (pkgs: {
       back = pkgs.callPackage ./back {};
+
+      front = pkgs.callPackage ./front {};
     });
   };
 }
