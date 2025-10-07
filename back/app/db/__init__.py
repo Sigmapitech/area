@@ -1,5 +1,5 @@
 from .base import Base, get_session, init_db
-from .models import User, UserToken, Workflow, WorkflowNode, WorkflowToken
+from .models import User, UserToken, Workflow, WorkflowNode
 
 __all__ = (
     "Base",
@@ -9,5 +9,4 @@ __all__ = (
     "Workflow",
     "WorkflowNode",
     "UserToken",
-    "WorkflowToken",
 )
