@@ -168,6 +168,8 @@ $icon: #e6e6e6;
     }
 
     .main-content {
+      display: grid;
+      place-items: center;
       flex: 1;
       align-self: stretch;
     }
