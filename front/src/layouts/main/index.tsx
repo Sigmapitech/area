@@ -1,25 +1,36 @@
-import AREA from "../../favicon.svg";
+import AREA from "../../../favicon.svg";
 import home from "@material-design-icons/svg/round/home.svg";
 import folder from "@material-design-icons/svg/round/folder.svg";
 import density_medium from "@material-design-icons/svg/round/density_medium.svg";
 import keyboard_arrow_down from "@material-design-icons/svg/round/keyboard_arrow_down.svg";
 import "./style.scss";
-import type { PropsWithChildren, ReactNode } from "react";
 
-type BasePageProps = PropsWithChildren<{
-  title?: string; // page title (last breadcrumb)
-  pageTitle?: string[]; // breadcrumb parts shown in center
-  userInitial?: string; // initial shown in user-icon
-}>;
+import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
 
-export default function BasePage({
-  children,
-  title = "MyWorkflow",
-  pageTitle = ["Page title", "/", "goes here"],
-  userInitial = "L",
-}: BasePageProps) {
-  const titleNodes: ReactNode[] = [];
-  pageTitle.forEach((b, i) => {
+import { Link, useLocation } from "react-router";
+import type { ReactNode } from "react";
+import { Outlet } from "react-router";
+
+export default function MainLayout() {
+  const { token } = useAuth();
+  const userInitial = fetch(`${API_BASE_URL}/api/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      return data.name ? data.name.charAt(0).toUpperCase() : "X";
+    })
+    .catch((e) => console.error(e));
+
+  const path = useLocation().pathname.split("/");
+  const titleNodes: ReactNode[] = [
+    <div key={`page`} className="text-wrapper">
+      {path.length > 1 ? path[1] : "Home"}
+    </div>,
+  ];
+  path.forEach((subname, i) => {
+    // Add separator before all but first breadcrumb
     if (i > 0)
       titleNodes.push(
         <div key={`sep-${i}`} className="text-wrapper">
@@ -28,34 +39,18 @@ export default function BasePage({
       );
     titleNodes.push(
       <div key={`b-${i}`} className="text-wrapper">
-        {b}
+        {subname}
       </div>
     );
   });
-  // append title as final breadcrumb if provided and different from last breadcrumb
-  if (
-    title &&
-    (pageTitle.length === 0 || pageTitle[pageTitle.length - 1] !== title)
-  ) {
-    titleNodes.push(
-      <div key={`sep-title`} className="text-wrapper">
-        /
-      </div>
-    );
-    titleNodes.push(
-      <div key={`title`} className="text-wrapper">
-        {title}
-      </div>
-    );
-  }
 
   return (
-    <div className="base-page">
+    <div className="main">
       <div className="top-bar">
         <div className="top-left-corner">
-          <button className="vector-button" aria-label="Home">
+          <Link to="/" className="vector-wrapper home-link">
             <img className="img" alt="Home" src={home} />
-          </button>
+          </Link>
         </div>
 
         <div className="top-content">
@@ -75,7 +70,6 @@ export default function BasePage({
             <div className="vector-wrapper">
               <img className="img" alt="Folder" src={folder} />
             </div>
-
             {titleNodes}
 
             <div className="vector-wrapper">
@@ -102,7 +96,9 @@ export default function BasePage({
           </div>
         </div>
 
-        <div className="main-content">{children}</div>
+        <div className="main-content">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
