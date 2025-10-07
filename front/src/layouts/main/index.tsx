@@ -40,12 +40,12 @@ export default function MainLayout() {
     // Add separator before all but first breadcrumb
     if (i > 0)
       titleNodes.push(
-        <div key={`sep-${i}`} className="text-wrapper">
+        <div key={`sep-${subname}`} className="text-wrapper">
           /
         </div>
       );
     titleNodes.push(
-      <div key={`b-${i}`} className="text-wrapper">
+      <div key={`b-${subname}`} className="text-wrapper">
         {subname}
       </div>
     );
