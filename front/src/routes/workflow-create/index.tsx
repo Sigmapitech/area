@@ -21,22 +21,27 @@ export default function WorkflowList() {
     id: 0,
   });
 
-  const createNewWorkflow = (info: React.FormEvent) => {
-    info.preventDefault();
+  const createNewWorkflow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/workflow`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newWorkflow.name,
+          description: newWorkflow.description,
+        }),
+      });
+      const data = await response.json();
 
-    fetch(`${API_BASE_URL}/api/workflow`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: newWorkflow.name,
-        description: newWorkflow.description,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => setWorkflows([...workflows, data]));
+      setWorkflows((prev) => [...prev, data]);
+      setNewWorkflow({ id: 0, name: "", description: "" });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -44,10 +49,12 @@ export default function WorkflowList() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
-      .then((data) => setWorkflows(data))
+      .then((data) => {
+        console.log(data);
+        setWorkflows(data);
+      })
       .catch((e) => console.error(e));
-    console.table(workflows);
-  }, [workflows, token]);
+  }, [token]);
 
   return (
     <>
