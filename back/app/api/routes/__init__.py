@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
+from ...providers.spotify import spotify
 from . import auth, graph, hello
 
 routers = []
 
-for mod in (auth, graph, hello):
+for mod in (auth, graph, hello, spotify):
     assert hasattr(
         mod, "router"
     ), f"Module {mod.__name__} is missing 'router' attribute"

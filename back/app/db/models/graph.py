@@ -13,6 +13,11 @@ class Workflow(Base):
     description = Column(String(512), nullable=True)
 
     nodes = relationship("WorkflowNode", back_populates="workflow")
+    tokens = relationship(
+        "WorkflowToken",
+        back_populates="workflow",
+        cascade="all, delete-orphan",
+    )
 
 
 class WorkflowNode(Base):

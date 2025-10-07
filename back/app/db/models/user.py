@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..base import Base
 
@@ -10,3 +11,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     auth = Column(String, nullable=False)
     name = Column(String, nullable=False)
+
+    tokens = relationship(
+        "UserToken", back_populates="user", cascade="all, delete-orphan"
+    )
