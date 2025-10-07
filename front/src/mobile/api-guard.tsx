@@ -1,17 +1,25 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "@/api_url";
 
 export function CheckAPIConnection() {
   const [status, setStatus] = useState<"loading" | "ok" | "error" | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchData = async () => {
-    setLoading(true);
+  const skip = () => navigate("/home");
+
+  const checkAPI = useCallback(async () => {
     setStatus("loading");
     try {
-      const res = await fetch(`${API_BASE_URL}/api/hello`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+
+      const res = await fetch(`${API_BASE_URL}/api/hello`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
       if (res.ok) {
         setStatus("ok");
         navigate("/home");
@@ -20,18 +28,12 @@ export function CheckAPIConnection() {
       }
     } catch {
       setStatus("error");
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const skip = () => {
-    navigate("/home");
-  };
+  }, [navigate]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    checkAPI();
+  }, [checkAPI]);
 
   return (
     <div style={{ display: "grid", placeItems: "center" }}>
@@ -50,7 +52,7 @@ export function CheckAPIConnection() {
       </div>
       <br />
       <div style={{ display: "flex", gap: "1em" }}>
-        <button type="button" onClick={fetchData}>
+        <button type="button" onClick={checkAPI}>
           Retry
         </button>
         <button type="button" onClick={skip}>
