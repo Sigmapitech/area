@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 import "./auth.scss";
 
@@ -15,30 +15,30 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+    fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Invalid credentials");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        login(data.token);
+        navigate("/");
+      })
+      .catch((err) => {
+        setError((err as Error)?.message || "An unknown error occurred");
       });
-
-      if (!response.ok) {
-        throw new Error("Invalid credentials");
-      }
-
-      const data = await response.json();
-
-      login(data.token);
-      navigate("/");
-    } catch (err) {
-      setError(err?.message);
-    }
   };
 
   return (
@@ -73,6 +73,12 @@ export default function LoginPage() {
 
         <div className="actions">
           <input className="btn btn-validate" type="submit" value="Sign in" />
+        </div>
+        <div className="info">
+          <p>Don't have an account?</p>
+          <Link className="btn btn-register" to="/register">
+            Register
+          </Link>
         </div>
       </form>
     </div>

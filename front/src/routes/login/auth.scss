@@ -89,6 +89,34 @@
     }
   }
 
+  .info {
+    margin-top: 1em;
+    display: flex;
+    align-items: flex-start;
+    grid-gap: 2em;
+    color: #96bfff;
+    align-items: center;
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .btn-register {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #96bfff;
+      border: 1px solid #96bfff;
+      padding: .5em 1em;
+      border-radius: 1em;
+
+      &:hover {
+        background: #96bfff;
+        color: black;
+      }
+    }
+  }
+
   .actions {
     margin-top: 1em;
     display: flex;
