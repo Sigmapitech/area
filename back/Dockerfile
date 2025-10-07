@@ -24,6 +24,7 @@ COPY --from=builder /tmp/build/result /app
 
 # Expose server port and run
 ENV PORT=8080
+WORKDIR /app
 EXPOSE 8080
 # Pass "dev" to enable the CORS branch in app.main
 CMD ["/app/bin/area", "dev"]

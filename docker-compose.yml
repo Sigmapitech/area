@@ -2,16 +2,35 @@ services:
   server:
     build:
       context: .
-      dockerfile: back/dockerfile
+      dockerfile: back/Dockerfile
     ports:
       - "8080:8080"
+    working_dir: /app
+    volumes:
+      - ./back/config.toml:/app/config.toml:ro
+
+  client_mobile:
+    build:
+      context: .
+      dockerfile: front/android/Dockerfile
+    volumes:
+      - shared-artifacts:/shared
+    # Optional: wait for a short while on first run to produce the APK
+    healthcheck:
+      test: ["CMD", "test", "-f", "/shared/client.apk"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
   client_web:
     build:
       context: .
-      dockerfile: front/dockerfile
+      dockerfile: front/Dockerfile
     depends_on:
-      - server
+      client_mobile:
+        condition: service_healthy
+      server:
+        condition: service_started
     ports:
       - "8081:8081"
     volumes:
