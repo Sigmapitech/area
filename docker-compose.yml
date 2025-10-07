@@ -1,0 +1,26 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: back/dockerfile
+    ports:
+      - "8080:8080"
+
+  client_web:
+    build:
+      context: .
+      dockerfile: front/dockerfile
+    depends_on:
+      - server
+    ports:
+      - "8081:8081"
+    volumes:
+      - shared-artifacts:/app/share/www
+
+volumes:
+  shared-artifacts:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/shared-artifacts
+      o: bind
