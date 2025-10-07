@@ -5,8 +5,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.routes import routers
+from .api.routes import routers as api_router
 from .db import init_db
+from .providers import routers as provider_router
 
 
 @asynccontextmanager
@@ -17,8 +18,11 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(docs_url="/docs", lifespan=lifespan)
 
-for router in routers:
+for router in api_router:
     app.include_router(router, prefix="/api")
+
+for router in provider_router:
+    app.include_router(router, prefix="/provider")
 
 if "dev" in sys.argv:
     app.add_middleware(
