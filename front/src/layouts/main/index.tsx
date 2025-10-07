@@ -9,19 +9,26 @@ import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
 import { Link, useLocation } from "react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Outlet } from "react-router";
 
 export default function MainLayout() {
   const { token } = useAuth();
-  const userInitial = fetch(`${API_BASE_URL}/api/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      return data.name ? data.name.charAt(0).toUpperCase() : "X";
+  const [userInitial, setUserInitial] = useState("X");
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
-    .catch((e) => console.error(e));
+      .then((response) => response.json())
+      .then((data) => {
+        setUserInitial(data.name ? data.name.charAt(0).toUpperCase() : "X");
+      })
+      .catch((e) => {
+        console.error(e);
+        setUserInitial("X");
+      });
+  }, [token]);
 
   const path = useLocation().pathname.split("/");
   const titleNodes: ReactNode[] = [
