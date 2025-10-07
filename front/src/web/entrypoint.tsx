@@ -4,7 +4,7 @@ import { AuthProvider, LoginRequired } from "@/auth";
 import GraphPage from "@/routes/graph";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
-import WorkflowList from "@/routes/workflow_create";
+import WorkflowList from "@/routes/workflow-create";
 
 function WebApp() {
   return (

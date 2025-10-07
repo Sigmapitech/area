@@ -1,6 +1,9 @@
-import { API_BASE_URL } from "@/api_url";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
+
+import "./style.scss";
 
 interface Workflow {
   id: number;
@@ -8,8 +11,10 @@ interface Workflow {
   description: string;
 }
 
-const WorkflowList = () => {
-  const [workflows, setWorkflows] = useState<Workflow[]>();
+export default function WorkflowList() {
+  const { token } = useAuth();
+
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [newWorkflow, setNewWorkflow] = useState<Workflow>({
     name: "",
     description: "",
@@ -18,33 +23,36 @@ const WorkflowList = () => {
 
   const createNewWorkflow = (info: React.FormEvent) => {
     info.preventDefault();
-    const formData = new FormData();
-    formData.append("name", newWorkflow.name);
-    formData.append("description", newWorkflow.description);
 
     fetch(`${API_BASE_URL}/api/workflow`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: formData,
-    });
+      body: JSON.stringify({
+        name: newWorkflow.name,
+        description: newWorkflow.description,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => setWorkflows([...workflows, data]));
   };
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/workflow`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
       .then((data) => setWorkflows(data))
       .catch((e) => console.error(e));
-  }, []);
+    console.table(workflows);
+  }, [workflows, token]);
 
-  console.table(workflows);
   return (
     <>
       <Link to="/">Back to home</Link>
-      <form className="Create new Workflow" onSubmit={createNewWorkflow}>
+      <form className="workflow-create-form" onSubmit={createNewWorkflow}>
         <input
           type="text"
           placeholder="Name"
@@ -63,12 +71,16 @@ const WorkflowList = () => {
           }
         />
         <button type="submit">Create new workflow</button>
-        {workflows?.map((workflow) => (
-          <li key={workflow.id}>{workflow.name}</li>
-        ))}
       </form>
+      <ul>
+        {workflows.map((workflow) => (
+          <li className="workflow" key={workflow.id}>
+            <p>{workflow.id}</p>
+            <p>{workflow.name}</p>
+            <p key={workflow.id}>{workflow.description}</p>
+          </li>
+        ))}
+      </ul>
     </>
   );
-};
-
-export default WorkflowList;
+}
