@@ -1,4 +1,5 @@
 import os
+from http import HTTPStatus
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,7 +27,7 @@ def client():
 @pytest.fixture(scope="session")
 def registered_user(client):
     resp = client.post("/api/auth/register/", json=USER)
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     return USER
 
 
@@ -40,7 +41,7 @@ def auth_headers(client, registered_user):
         },
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     token = resp.json().get("token")
     assert token
     return {"Authorization": f"Bearer {token}"}
@@ -51,5 +52,5 @@ def workflow(client, auth_headers):
     """Create a fresh workflow for a test."""
     wf_payload = {"name": "My graph", "description": "Demo workflow"}
     resp = client.post("/api/workflow", json=wf_payload, headers=auth_headers)
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     return resp.json()
