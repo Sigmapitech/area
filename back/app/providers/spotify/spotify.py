@@ -1,3 +1,4 @@
+import logging
 import uuid
 from datetime import datetime, timedelta
 
@@ -13,6 +14,8 @@ from ...db import get_session
 from ...db.models.oauth import UserToken
 from ...db.models.user import User
 from ...security.deps import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/spotify", tags=["spotify"])
 
@@ -82,7 +85,7 @@ async def spotify_auth(
         )
 
     tokens = resp.json()
-    print(f"[Spotify] Tokens for user {user.id}: {tokens}")
+    logger.debug(f"[Spotify] Tokens for user {user.id}: {tokens}")
 
     token = UserToken(
         user_id=user.id,
@@ -150,7 +153,7 @@ async def spotify_refresh(
         )
 
     tokens = resp.json()
-    print(f"[Spotify] Refreshed tokens for user {user.id}: {tokens}")
+    logger.debug(f"[Spotify] Refreshed tokens for user {user.id}: {tokens}")
 
     setattr(token, "access_token", tokens.get("access_token"))
     if "refresh_token" in tokens:  # Spotify may or may not return it
@@ -176,7 +179,6 @@ async def spotify_me(
     """
     Fetch current user's Spotify profile. Auto-refresh token if expired.
     """
-    print(await db.scalars(select(UserToken)))
     token = await db.scalar(
         select(UserToken).where(
             UserToken.user_id == user.id, UserToken.service == "spotify"
