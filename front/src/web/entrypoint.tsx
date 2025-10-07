@@ -6,6 +6,7 @@ import GraphPage from "@/routes/graph";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
 import TestSpotifyPage from "@/routes/test-spotify";
+import RegisterPage from "@/routes/register";
 import WorkflowList from "@/routes/workflow-create";
 
 function WebApp() {
@@ -14,6 +15,7 @@ function WebApp() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<LoginRequired />}>
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
