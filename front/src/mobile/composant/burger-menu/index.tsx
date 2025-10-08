@@ -1,5 +1,6 @@
-import React from "react";
+import type React from "react";
 import "./burger.scss";
+import { type RefObject, useEffect } from "react";
 
 {
   /*
@@ -16,8 +17,6 @@ interface BurgerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
-
-import { useEffect, type RefObject } from "react";
 
 type EventType = TouchEvent;
 
@@ -46,6 +45,7 @@ const Burger: React.FC<BurgerProps & { children?: React.ReactNode }> = ({
   return (
     <div>
       <button
+        type="button"
         className={`burger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)}
         aria-label="Toggle menu"
