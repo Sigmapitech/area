@@ -7,7 +7,7 @@ import type { FormEvent } from "react";
 
 export default function ProfilePage() {
   const { token } = useAuth();
-  const [name, setName] = useState("?");
+  const [username, setUsername] = useState("?");
   const [email, setEmail] = useState("?");
 
   useEffect(() => {
@@ -18,29 +18,40 @@ export default function ProfilePage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        setName(data.name);
+        setUsername(data.name);
         setEmail(data.email);
       })
-      .catch((e) => {
-        console.error(e);
+      .catch((err) => {
+        alert((err as Error)?.message || "An unknown error occurred");
       });
   }, [token]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    fetch(`${API_BASE_URL}/api/auth/update`, {
-      method: "POST",
+    if (!token) {
+      alert("You must be logged in to update your profile");
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/api/auth/me`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email, username }),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Invalid credentials");
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         return response.json();
+      })
+      .then((data) => {
+        alert("Profile updated successfully!");
+        setUsername(data.name);
+        setEmail(data.email);
       })
       .catch((err) => {
         alert((err as Error)?.message || "An unknown error occurred");
@@ -51,16 +62,16 @@ export default function ProfilePage() {
     <form className="profile-page" onSubmit={handleSubmit}>
       <h2>Profile</h2>
       <hr />
-      <p>name</p>
+      <p>username</p>
       <input
         type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={username || ""}
+        onChange={(e) => setUsername(e.target.value)}
       />
       <p>email</p>
       <input
         type="text"
-        value={email}
+        value={email || ""}
         onChange={(e) => setEmail(e.target.value)}
       />
       <input type="submit" value="Update Profile" />
