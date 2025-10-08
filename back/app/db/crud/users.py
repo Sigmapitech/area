@@ -84,3 +84,11 @@ async def update_user(db: AsyncSession, user: User, data: dict):
     await db.commit()
     await db.refresh(user)
     return user
+
+
+async def update_password(db: AsyncSession, user: User, new_password: str):
+    setattr(user, "auth", bcrypt.hash(new_password))
+
+    await db.commit()
+    await db.refresh(user)
+    return user

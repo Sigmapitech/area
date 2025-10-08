@@ -7,6 +7,7 @@ from ...db.base import AsyncSession, get_session
 from ...db.crud import users
 from ...schemas import AuthResponse, UserSchema
 from ...schemas.user import (
+    AccountUpdatePasswordRequest,
     AccountUpdateRequest,
     LoginRequest,
     RegisterRequest,
@@ -87,3 +88,20 @@ async def update_me(
     user = await users.update_user(db, current_user, user.model_dump())
 
     return user
+
+
+@router.post(
+    "/update-password",
+    response_model=UserSchema,
+    description="Update current user",
+    responses={
+        200: {"model": UserSchema, "description": "Current user data"},
+        401: {"description": "Unauthorized"},
+    },
+)
+async def update_password(
+    data: AccountUpdatePasswordRequest,
+    current_user=Depends(get_current_user),
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    return await auth_service.update_user_password(current_user, data)
