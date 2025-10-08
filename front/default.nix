@@ -47,7 +47,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p $out/bin
     cat > $out/bin/web <<'EOF'
     #!${stdenvNoCC.shell}
-    exec ${lib.getExe serve} "$out/share/area-front"
+    exec ${lib.getExe serve} "$out/share/area-front" -p 8081
     EOF
     chmod +x $out/bin/web
 
