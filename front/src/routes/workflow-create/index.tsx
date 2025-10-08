@@ -13,6 +13,7 @@ interface Workflow {
 
 export default function WorkflowList() {
   const { token } = useAuth();
+
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [newWorkflow, setNewWorkflow] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(true);
@@ -79,51 +80,54 @@ export default function WorkflowList() {
   if (loading) return <div className="workflow-list__loading">Loading...</div>;
 
   return (
-    <div className="workflow-list">
-      <h1>Workflows</h1>
+    <div className="workflow-wrapper">
+      <div className="workflow-list">
+        <h1>Workflows</h1>
 
-      <form className="workflow-create-form" onSubmit={createNewWorkflow}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={newWorkflow.name}
-          onChange={(e) =>
-            setNewWorkflow((f) => ({ ...f, name: e.target.value }))
-          }
-          required
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={newWorkflow.description}
-          onChange={(e) =>
-            setNewWorkflow((f) => ({ ...f, description: e.target.value }))
-          }
-        />
-        <button type="submit">＋ Create Workflow</button>
-      </form>
+        <form className="workflow-create-form" onSubmit={createNewWorkflow}>
+          <input
+            type="text"
+            placeholder="Name"
+            value={newWorkflow.name}
+            onChange={(e) =>
+              setNewWorkflow((f) => ({ ...f, name: e.target.value }))
+            }
+            required
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={newWorkflow.description}
+            onChange={(e) =>
+              setNewWorkflow((f) => ({ ...f, description: e.target.value }))
+            }
+          />
+          <button type="submit">＋ Create Workflow</button>
+        </form>
 
-      <ul className="workflow-items">
-        {workflows.map((workflow) => (
-          <li className="workflow-card" key={workflow.id}>
-            <div className="workflow-card__main">
-              <h3>{workflow.name}</h3>
-              <p>{workflow.description || "No description"}</p>
-            </div>
-            <div className="workflow-card__actions">
-              <Link to={`/workflow/${workflow.id}`} className="view-btn">
-                View
-              </Link>
-              <button
-                className="delete-btn"
-                onClick={() => deleteWorkflow(workflow.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+        <ul className="workflow-items">
+          {workflows.map((workflow) => (
+            <li className="workflow-card" key={workflow.id}>
+              <div className="workflow-card__main">
+                <h3>{workflow.name}</h3>
+                <p>{workflow.description || "No description"}</p>
+              </div>
+              <div className="workflow-card__actions">
+                <Link to={`/workflow/${workflow.id}`} className="view-btn">
+                  View
+                </Link>
+                <button
+                  type="button"
+                  className="delete-btn"
+                  onClick={() => deleteWorkflow(workflow.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

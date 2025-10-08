@@ -59,7 +59,7 @@ export default function TestSpotifyPage() {
 
   return (
     <StrictMode>
-      <div className="home-page">
+      <div className="test-spotify" style={{ padding: "1em" }}>
         {(!connected && (
           <button type="button" onClick={connectDiscord}>
             Connect with Spotify
