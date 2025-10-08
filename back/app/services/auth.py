@@ -5,8 +5,13 @@ from passlib.hash import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db.base import get_session
-from ..db.crud.users import create_user, get_by_email
-from ..schemas.user import AuthResponse, LoginRequest, RegisterRequest
+from ..db.crud.users import create_user, get_by_email, update_password
+from ..schemas.user import (
+    AccountUpdatePasswordRequest,
+    AuthResponse,
+    LoginRequest,
+    RegisterRequest,
+)
 from ..security.jwt import create_access_token, decode_access_token
 
 logger = getLogger(__name__)
@@ -49,6 +54,11 @@ class AuthService:
             raise HTTPException(
                 status_code=401, detail="Invalid or expired token"
             )
+
+    async def update_user_password(
+        self, current_user, data: AccountUpdatePasswordRequest
+    ):
+        return await update_password(self.db, current_user, data.new_password)
 
 
 async def get_auth_service(

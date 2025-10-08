@@ -31,6 +31,15 @@ class RegisterRequest(BaseModel):
     name: str
 
 
+class AccountUpdateRequest(BaseModel):
+    email: EmailStr | None = None
+    username: str | None = None
+
+
+class AccountUpdatePasswordRequest(BaseModel):
+    new_password: str
+
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str

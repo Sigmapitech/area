@@ -76,3 +76,19 @@ async def list_users(
     """
     result = await db.execute(select(User).offset(skip).limit(limit))
     return result.scalars().all()
+
+
+async def update_user(db: AsyncSession, user: User, data: dict):
+    for key, value in data.items():
+        setattr(user, key, value)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def update_password(db: AsyncSession, user: User, new_password: str):
+    setattr(user, "auth", bcrypt.hash(new_password))
+
+    await db.commit()
+    await db.refresh(user)
+    return user
