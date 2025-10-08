@@ -2,17 +2,6 @@ import type React from "react";
 import "./burger.scss";
 import { type RefObject, useEffect } from "react";
 
-{
-  /*
-  How to use the component:
-    -> include mobile/composant/burger-menu
-    -> open the burger-menu component with an `open` state (a boolean)
-      and the function to open/close the menu (follow example in the entrypoint.tsx file).
-    -> put all the components you want inside of it
-    -> close the burger-menu component
-*/
-}
-
 interface BurgerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -36,6 +25,13 @@ export const useOnClickOutside = <T extends HTMLElement>(
     };
   }, [ref, handler]);
 };
+
+//How to use the component:
+//  -> include mobile/composant/burger-menu
+//  -> open the burger-menu component with an `open` state (a boolean)
+//    and the function to open/close the menu (follow example in the entrypoint.tsx file).
+//  -> put all the components you want inside of it
+//  -> close the burger-menu component
 
 const Burger: React.FC<BurgerProps & { children?: React.ReactNode }> = ({
   open,
