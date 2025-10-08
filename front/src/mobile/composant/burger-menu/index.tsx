@@ -43,7 +43,11 @@ const Burger: React.FC<BurgerProps & { children?: React.ReactNode }> = ({
         <div />
         <div />
       </button>
-      {open && <div className="burger-content">{children}</div>}
+      {open && (
+        <div className="burger-content">
+          <div className="burger-value">{children}</div>
+        </div>
+      )}
     </div>
   );
 };

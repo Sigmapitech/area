@@ -1,6 +1,6 @@
 .burger {
   position: absolute;
-  top: 5%;
+  top: 7.5%;
   left: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,7 @@
 
 .burger-content {
   position: absolute;
-  top: 3rem;
+  top: 5%;
   left: 0;
   right: 35%;
   bottom: 0%;
@@ -55,4 +55,9 @@
   padding: 1rem;
   border-radius: 8px;
   z-index: 5;
+}
+
+.burger-value {
+  color:black;
+  position: relative;
 }
