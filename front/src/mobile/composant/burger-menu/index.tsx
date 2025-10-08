@@ -27,17 +27,24 @@ export const useOnClickOutside = <T extends HTMLElement>(
   }, [ref, handler]);
 };
 
-const Burger: React.FC<BurgerProps> = ({ open, setOpen }) => {
+const Burger: React.FC<BurgerProps & { children?: React.ReactNode }> = ({
+  open,
+  setOpen,
+  children,
+}) => {
   return (
-    <button
-      className={`burger ${open ? "open" : ""}`}
-      onClick={() => setOpen(!open)}
-      aria-label="Toggle menu"
-    >
-      <div />
-      <div />
-      <div />
-    </button>
+    <div>
+      <button
+        className={`burger ${open ? "open" : ""}`}
+        onClick={() => setOpen(!open)}
+        aria-label="Toggle menu"
+      >
+        <div />
+        <div />
+        <div />
+      </button>
+      {open && <div className="burger-content">{children}</div>}
+    </div>
   );
 };
 

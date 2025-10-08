@@ -1,7 +1,7 @@
 .burger {
   position: absolute;
   top: 5%;
-  left: 2rem;
+  left: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -43,4 +43,16 @@
       background: #0D0C1D;
     }
   }
+}
+
+.burger-content {
+  position: absolute;
+  top: 3rem;
+  left: 0;
+  right: 35%;
+  bottom: 0%;
+  background: #EFFFFA;
+  padding: 1rem;
+  border-radius: 8px;
+  z-index: 5;
 }
