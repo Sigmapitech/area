@@ -5,10 +5,10 @@ import MainLayout from "@/layouts/main";
 import GraphPage from "@/routes/graph";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
-import TestSpotifyPage from "@/routes/test-spotify";
-import RegisterPage from "@/routes/register";
-import WorkflowList from "@/routes/workflow-create";
 import ProfilePage from "@/routes/profile";
+import RegisterPage from "@/routes/register";
+import TestSpotifyPage from "@/routes/test-spotify";
+import WorkflowList from "@/routes/workflow-create";
 
 function WebApp() {
   return (

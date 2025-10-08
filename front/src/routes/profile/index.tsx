@@ -1,9 +1,9 @@
 import "./style.scss";
 
-import { useAuth } from "@/auth";
-import { API_BASE_URL } from "@/api_url";
-import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
 
 export default function ProfilePage() {
   const { token } = useAuth();
