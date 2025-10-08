@@ -5,6 +5,7 @@ import MainLayout from "@/layouts/main";
 import GraphPage from "@/routes/graph";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
+import TestSpotifyPage from "@/routes/test-spotify";
 import WorkflowList from "@/routes/workflow-create";
 
 function WebApp() {
@@ -18,6 +19,7 @@ function WebApp() {
               <Route path="/" element={<HomePage />} />
               <Route path="/graph" element={<WorkflowList />} />
               <Route path="/graph/:id" element={<GraphPage />} />
+              <Route path="/test-spotify" element={<TestSpotifyPage />} />
             </Route>
           </Route>
         </Routes>

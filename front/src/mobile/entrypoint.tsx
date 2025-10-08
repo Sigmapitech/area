@@ -3,6 +3,7 @@ import { AuthProvider, LoginRequired } from "@/auth";
 import GraphPage from "@/routes/graph";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
+import TestSpotifyPage from "@/routes/test-spotify";
 import { CheckAPIConnection } from "./api-guard";
 
 function MobileApp() {
@@ -16,6 +17,7 @@ function MobileApp() {
           <Route element={<LoginRequired />}>
             <Route path="/home" element={<HomePage />} />
             <Route path="/graph" element={<GraphPage />} />
+            <Route path="/test-spotify" element={<TestSpotifyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
