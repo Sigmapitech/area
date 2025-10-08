@@ -28,8 +28,13 @@ export const useOnClickOutside = <T extends HTMLElement>(
 
 //How to use the component:
 //  -> include mobile/composant/burger-menu
+//  -> create the state and use the function for that tactile responsiveness
+//    -> ``` const [open, setOpen] = useState(false);
+//          const node = useRef<HTMLDivElement>(null);
+//          useOnClickOutside(node, () => setOpen(false));
+//        ```
 //  -> open the burger-menu component with an `open` state (a boolean)
-//    and the function to open/close the menu (follow example in the entrypoint.tsx file).
+//    and the function to open/close the menu
 //  -> put all the components you want inside of it
 //  -> close the burger-menu component
 
