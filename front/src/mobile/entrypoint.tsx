@@ -1,12 +1,13 @@
+import { useRef, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AuthProvider, LoginRequired } from "@/auth";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
 import TestSpotifyPage from "@/routes/test-spotify";
-import { CheckAPIConnection } from "./api-guard";
+import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
+import { CheckAPIConnection } from "./api-guard";
 import Burger, { useOnClickOutside } from "./composant/burger-menu";
-import { useRef, useState } from "react";
 
 function MobileApp() {
   const [open, setOpen] = useState(false);
