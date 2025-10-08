@@ -26,7 +26,7 @@ token_store = {}
 class Config(BaseModel):
     client_id: str
     client_secret: str
-    redirect_uri: str = "http://127.0.0.1:8000/provider/spotify/auth"
+    redirect_uri: str = "http://127.0.0.1:8080/providers/spotify/auth"
     api_base: str = "https://accounts.spotify.com"
     api_resource: str = "https://api.spotify.com/v1"
 
