@@ -2,6 +2,7 @@ from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..models import Workflow, WorkflowNode
 
@@ -31,7 +32,12 @@ async def list_workflows(
 async def get_workflow(
     db: AsyncSession, workflow_id: int, options=None
 ) -> Workflow | None:
-    query = select(Workflow).where(Workflow.id == workflow_id)
+    query = (
+        select(Workflow)
+        .where(Workflow.id == workflow_id)
+        .options(selectinload(Workflow.nodes))
+    )
+
     if options:
         query = query.options(*options)
     result = await db.execute(query)

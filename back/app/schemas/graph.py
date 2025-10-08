@@ -32,8 +32,22 @@ class WorkflowNodeRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class WorkflowDetail(WorkflowRead):
-    nodes: list[WorkflowNodeRead]
+class WorkflowNodeDetail(BaseModel):
+    id: int
+    parent_id: int | None
+    node_type: str
+    content: dict | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WorkflowDetail(BaseModel):
+    id: int
+    name: str
+    description: str | None
+    nodes: list[WorkflowNodeDetail] = []
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class NodeRead(BaseModel):
