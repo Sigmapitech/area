@@ -3,10 +3,15 @@ from logging import getLogger
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from app.security.deps import get_current_user
-
+from ...db.base import AsyncSession, get_session
+from ...db.crud import users
 from ...schemas import AuthResponse, UserSchema
-from ...schemas.user import LoginRequest, RegisterRequest
+from ...schemas.user import (
+    AccountUpdateRequest,
+    LoginRequest,
+    RegisterRequest,
+)
+from ...security.deps import get_current_user
 from ...services.auth import AuthService, get_auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -63,3 +68,22 @@ async def get_me(
     current_user: UserSchema = Depends(get_current_user),
 ) -> UserSchema:
     return current_user
+
+
+@router.patch(
+    "/me",
+    response_model=UserSchema,
+    description="Update current user",
+    responses={
+        200: {"model": UserSchema, "description": "Current user data"},
+        401: {"description": "Unauthorized"},
+    },
+)
+async def update_me(
+    user: AccountUpdateRequest,
+    db: AsyncSession = Depends(get_session),
+    current_user=Depends(get_current_user),
+):
+    user = await users.update_user(db, current_user, user.model_dump())
+
+    return user
