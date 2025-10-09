@@ -1,0 +1,10 @@
+# python
+__pycache__/
+.coverage
+
+# env
+.env*
+config.toml
+
+# db
+app.db
