@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "area-backend"
+version = "0.0.1"
+description = "A modular workflow runner with FastAPI, SQLAlchemy, and MariaDB"
+license = { text = "BSD-3-Clause" }
+requires-python = ">=3.12"
+dependencies = [
+  "bcrypt==4.3.0",
+  "email-validator",
+  "fastapi",
+  "httpx",
+  "passlib",
+  "pydantic",
+  "pyjwt",
+  "sqlalchemy[asyncio]",
+  "sqlmodel",
+  "uvicorn[standard]",
+]
+
+[project.scripts]
+area = "app.main:main"
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "isort",
+]
+testing = [
+  "aiosqlite",
+  "pytest",
+  "pytest-cov",
+  "pytest-env",
+  "pytest-xdist",
+  "pytest-asyncio",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.black]
+line-length = 79
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 79
+known_first_party = ["app"]
+multi_line_output = 3
+include_trailing_comma = true
