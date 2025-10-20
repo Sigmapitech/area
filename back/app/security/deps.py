@@ -2,7 +2,7 @@ from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
-from ..db.crud.users import get_by_id
+from ..db.crud import users
 from .jwt import decode_access_token
 
 
@@ -22,7 +22,7 @@ async def get_current_user(
         payload["id"], int
     ), "Token payload must contain 'id'"
 
-    user = await get_by_id(db, payload["id"])
+    user = await users.get_by_id(db, payload["id"])
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
