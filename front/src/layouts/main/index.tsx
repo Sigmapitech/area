@@ -1,14 +1,16 @@
 import AREA from "../../../favicon.svg";
 import "./style.scss";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Outlet } from "react-router";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
 export default function MainLayout() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [userInitial, setUserInitial] = useState("?");
+  const [menuVisible, setMenuVisible] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -25,6 +27,23 @@ export default function MainLayout() {
       });
   }, [token]);
 
+  const toggleMenu = () => {
+    setMenuVisible((prev) => !prev);
+  };
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setMenuVisible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
   return (
     <div className="main">
       <header className="main-bar">
@@ -33,9 +52,48 @@ export default function MainLayout() {
           <span>Area</span>
         </Link>
 
-        <div className="user-icon">
-          <span className="user-icon-intial">{userInitial}</span>
+        <div className="user-icon-wrapper" ref={menuRef}>
+          <button type="button" className="user-icon" onClick={toggleMenu}>
+            <span className="user-icon-initial">{userInitial}</span>
+          </button>
         </div>
+        {menuVisible && (
+          <div
+            role="menu"
+            className="user-menu"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <ul>
+              <li>
+                <Link to="/profile">
+                  <span className="material-icons">person</span>
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <Link to="/settings">
+                  <span className="material-icons">settings</span>
+                  Settings
+                </Link>
+              </li>
+              <li
+                onClick={() => {
+                  logout();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    logout();
+                  }
+                }}
+                // biome-ignore lint: element li is interactive.
+                tabIndex={0}
+              >
+                <span className="material-icons">logout</span>
+                Logout
+              </li>
+            </ul>
+          </div>
+        )}
       </header>
 
       <main className="main-content">
