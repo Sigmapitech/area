@@ -7,7 +7,7 @@ import { useAuth } from "@/auth";
 
 export default function ProfilePage() {
   const { token } = useAuth();
-  const [username, setUsername] = useState("?");
+  const [name, setUsername] = useState("?");
   const [email, setEmail] = useState("?");
 
   useEffect(() => {
@@ -33,14 +33,14 @@ export default function ProfilePage() {
       alert("You must be logged in to update your profile");
       return;
     }
-
+    console.log(JSON.stringify({ email, name }));
     fetch(`${API_BASE_URL}/api/auth/me`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ email, username }),
+      body: JSON.stringify({ email, name }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -62,10 +62,10 @@ export default function ProfilePage() {
     <form className="profile-page" onSubmit={handleSubmit}>
       <h2>Profile</h2>
       <hr />
-      <p>username</p>
+      <p>name</p>
       <input
         type="text"
-        value={username || ""}
+        value={name || ""}
         onChange={(e) => setUsername(e.target.value)}
       />
       <p>email</p>

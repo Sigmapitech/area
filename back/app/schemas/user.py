@@ -33,7 +33,7 @@ class RegisterRequest(BaseModel):
 
 class AccountUpdateRequest(BaseModel):
     email: EmailStr | None = None
-    username: str | None = None
+    name: str | None = None
 
 
 class AccountUpdatePasswordRequest(BaseModel):
