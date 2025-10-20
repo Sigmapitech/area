@@ -14,8 +14,16 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordValid, setPasswordValid] = useState(true);
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  function isPasswordValid(pw: string): boolean {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      pw
+    );
+  }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,11 +34,7 @@ export default function RegisterPage() {
       return;
     }
 
-    if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        password
-      )
-    ) {
+    if (!isPasswordValid(password)) {
       setError(
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
       );
@@ -86,13 +90,31 @@ export default function RegisterPage() {
             required
           />
         </div>
+
+        {!passwordValid && <p className="error">{passwordError}</p>}
+
         <div className="auth-box">
           <label htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (!isPasswordValid(e.target.value)) {
+                setPasswordValid(false);
+                setPasswordError(
+                  "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+                );
+                return;
+              }
+              if (e.target.value !== confirmPassword) {
+                setPasswordValid(false);
+                setPasswordError("Passwords do not match");
+                return;
+              }
+              setPasswordValid(true);
+            }}
             required
           />
         </div>
@@ -102,7 +124,22 @@ export default function RegisterPage() {
             type="password"
             name="confirmPassword"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (e.target.value !== password) {
+                setPasswordValid(false);
+                setPasswordError("Passwords do not match");
+                return;
+              }
+              if (!isPasswordValid(e.target.value)) {
+                setPasswordValid(false);
+                setPasswordError(
+                  "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+                );
+                return;
+              }
+              setPasswordValid(true);
+            }}
             required
           />
         </div>
