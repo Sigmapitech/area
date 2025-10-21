@@ -1,8 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from passlib.hash import bcrypt
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db.base import get_session
+from ..db.base import AsyncSession, get_session
 from ..db.crud import users
 from ..schemas.user import (
     AccountUpdateRequest,
@@ -11,7 +10,7 @@ from ..schemas.user import (
     RegisterRequest,
     UserSchema,
 )
-from ..security.jwt import create_access_token
+from ..security.jwt import create_access_token, create_refresh_token
 
 
 def hash_password(password: str) -> str:
@@ -33,6 +32,7 @@ async def register_user(
     user = await users.create_user(
         db, email=data.email, password=data.password, name=data.name
     )
+
     return _create_auth_response(user)
 
 
@@ -40,7 +40,7 @@ async def login_user(
     data: LoginRequest, db: AsyncSession = Depends(get_session)
 ) -> AuthResponse:
     user = await users.get_by_email(db, data.email)
-    if not user or not bcrypt.verify(data.password, str(user.auth)):
+    if not user or not verify_password(data.password, str(user.auth)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
@@ -56,13 +56,28 @@ async def update_credentials(
     return await users.update_user(db, user, update_data)
 
 
+async def refresh_tokens(
+    user_id: int, db: AsyncSession = Depends(get_session)
+) -> AuthResponse:
+    user = await users.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    return _create_auth_response(user)
+
+
 def _create_auth_response(user) -> AuthResponse:
-    token = create_access_token({"id": user.id, "email": user.email})
-    return AuthResponse(token=token)
+    access_token = create_access_token(user.id, user.email)
+    refresh_token = create_refresh_token(user.id)
+
+    return AuthResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 def _validate_update_request(user, data: AccountUpdateRequest) -> dict:
     update_data = {}
+
     if data.email:
         update_data["email"] = data.email
     if data.name:
@@ -77,7 +92,7 @@ def _validate_update_request(user, data: AccountUpdateRequest) -> dict:
         )
 
     if "email" in update_data or "password" in update_data:
-        if not data.current_password or not bcrypt.verify(
+        if not data.current_password or not verify_password(
             data.current_password, str(user.auth)
         ):
             raise HTTPException(

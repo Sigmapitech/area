@@ -1,7 +1,14 @@
 from logging import getLogger
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.crud import users
+from app.security.jwt import (
+    create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
+)
 
 from ..db.base import get_session
 from ..schemas.user import (
@@ -61,7 +68,9 @@ async def login_user(
         404: {"description": "User not found"},
     },
 )
-async def get_me(current_user: UserSchema = Depends(get_current_user)) -> UserSchema:
+async def get_me(
+    current_user: UserSchema = Depends(get_current_user),
+) -> UserSchema:
     return current_user
 
 
@@ -80,3 +89,11 @@ async def update_me(
     db: AsyncSession = Depends(get_session),
 ):
     return await auth.update_credentials(current_user, user, db)
+
+
+@router.post("/refresh", response_model=AuthResponse)
+async def refresh_token(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    return await auth.refresh_tokens(current_user.id, db)

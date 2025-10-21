@@ -1,5 +1,6 @@
 import asyncio
 import os
+from typing import cast
 
 import pytest
 from fastapi.testclient import TestClient
@@ -65,7 +66,8 @@ def auth_header(override_db):
     )
 
     token = create_access_token(
-        {"id": registered_user.id, "email": registered_user.email}
+        user_id=cast(int, registered_user.id),
+        user_email=cast(str, registered_user.email),
     )
 
     return {"Authorization": f"Bearer {token}"}

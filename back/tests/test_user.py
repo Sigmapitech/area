@@ -3,6 +3,7 @@ from http import HTTPStatus
 import pytest
 
 from app.db.crud.users import create_user
+from app.security.jwt import decode_access_token, decode_refresh_token
 
 
 def test_user_registration(client, override_db):
@@ -14,9 +15,9 @@ def test_user_registration(client, override_db):
     resp = client.post("/auth/register/", json=new_user)
     assert resp.status_code == HTTPStatus.CREATED
     data = resp.json()
-    assert "token" in data
+    assert "access_token" in data
     resp = client.get(
-        "/auth/me", headers={"authorization": f"Bearer {data['token']}"}
+        "/auth/me", headers={"authorization": f"Bearer {data['access_token']}"}
     )
     assert resp.status_code == HTTPStatus.OK
     data = resp.json()
@@ -46,7 +47,7 @@ async def test_user_login(client, override_db):
     )
 
     assert resp.status_code == HTTPStatus.OK
-    assert "token" in resp.json()
+    assert "access_token" in resp.json()
 
 
 @pytest.mark.asyncio
@@ -103,3 +104,48 @@ def test_user_update_sensitive(client, auth_header):
         headers=auth_header,
     )
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+
+
+
+
+@pytest.mark.asyncio
+async def test_refresh_token(client, override_db):
+    password = "Pytest1234!"
+    user = await create_user(
+        db=override_db,
+        email="refresh_user@test.com",
+        name="refresh_user",
+        password=password,
+    )
+
+    login_resp = client.post(
+        "/auth/login/",
+        json={"email": user.email, "password": password},
+    )
+
+    assert login_resp.status_code == HTTPStatus.OK
+    tokens = login_resp.json()
+    refresh_token = tokens.get("refresh_token")
+    assert refresh_token is not None
+
+    refresh_resp = client.post(
+        "/auth/refresh/",
+        headers={"authorization": f"Bearer {refresh_token}"}
+    )
+    assert refresh_resp.status_code == HTTPStatus.OK
+    new_tokens = refresh_resp.json()
+    assert "access_token" in new_tokens
+    assert "refresh_token" in new_tokens
+
+    access_payload = decode_access_token(new_tokens["access_token"])
+    refresh_payload = decode_refresh_token(new_tokens["refresh_token"])
+
+    assert access_payload.id == user.id
+    assert refresh_payload.id == user.id
+
+    invalid_resp = client.post(
+        "/auth/refresh/",
+        headers={"authorization": "Bearer invalidtoken"}
+    )
+
+    assert invalid_resp.status_code == HTTPStatus.UNAUTHORIZED
