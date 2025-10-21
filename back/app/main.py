@@ -18,5 +18,6 @@ app = FastAPI(docs_url="/docs", lifespan=lifespan)
 for route in routers:
     app.include_router(route)
 
+
 def main():
     uvicorn.run(app, host="127.0.0.1", port=8080)

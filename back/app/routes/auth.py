@@ -1,10 +1,9 @@
 from logging import getLogger
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db.base import AsyncSession, get_session
-from ..db.crud import users
+from ..db.base import get_session
 from ..schemas.user import (
     AccountUpdateRequest,
     AuthResponse,
@@ -13,14 +12,10 @@ from ..schemas.user import (
     UserSchema,
 )
 from ..security.deps import get_current_user
-from ..services.auth import AuthService, get_auth_service
+from ..services import auth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = getLogger(__name__)
-
-
-class VerificationRequest(BaseModel):
-    code: int
 
 
 @router.post(
@@ -35,9 +30,9 @@ class VerificationRequest(BaseModel):
 )
 async def register_user(
     data: RegisterRequest,
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.register_user(data)
+    return await auth.register_user(data, db)
 
 
 @router.post(
@@ -51,9 +46,9 @@ async def register_user(
 )
 async def login_user(
     data: LoginRequest,
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.login_user(data)
+    return await auth.login_user(data, db)
 
 
 @router.get(
@@ -66,9 +61,7 @@ async def login_user(
         404: {"description": "User not found"},
     },
 )
-async def get_me(
-    current_user: UserSchema = Depends(get_current_user),
-) -> UserSchema:
+async def get_me(current_user: UserSchema = Depends(get_current_user)) -> UserSchema:
     return current_user
 
 
@@ -84,6 +77,6 @@ async def get_me(
 async def update_me(
     user: AccountUpdateRequest,
     current_user=Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.update_credentials(current_user, user)
+    return await auth.update_credentials(current_user, user, db)

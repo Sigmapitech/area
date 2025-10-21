@@ -49,6 +49,26 @@ async def test_user_login(client, override_db):
     assert "token" in resp.json()
 
 
+@pytest.mark.asyncio
+async def test_user_login_bad(client, override_db):
+    password = "Pytest1234!"
+    registered_user = await create_user(
+        db=override_db,
+        email="pytest_user@test.com",
+        name="pytest_user",
+        password=password,
+    )
+    resp = client.post(
+        "/auth/login/",
+        json={
+            "email": registered_user.email,
+            "password": password + "nope",
+        },
+    )
+
+    assert resp.status_code != HTTPStatus.OK
+
+
 def test_user_update(client, auth_header):
     resp = client.patch(
         "/auth/credentials",
