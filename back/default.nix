@@ -43,6 +43,7 @@ python3Packages.buildPythonApplication {
     pytestCheckHook
     pytest-env
     pytest-cov-stub
+    pytest-asyncio
   ];
 
   meta = {
