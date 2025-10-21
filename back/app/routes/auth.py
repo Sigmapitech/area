@@ -11,6 +11,7 @@ from ..schemas.user import (
     RegisterRequest,
     UserSchema,
 )
+from ..db.crud import users
 from ..security.deps import get_current_user
 from ..services import auth
 
@@ -80,3 +81,18 @@ async def update_me(
     db: AsyncSession = Depends(get_session),
 ):
     return await auth.update_credentials(current_user, user, db)
+
+@router.delete(
+    "/delete",
+    description="Delete current user account",
+    responses={
+        204: {"description": "Account deleted successfully"},
+        401: {"description": "Unauthorized"},
+    },
+    status_code=204,
+)
+async def delete_me(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await users.delete_user(db, current_user.id)
