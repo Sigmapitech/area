@@ -1,11 +1,9 @@
-from logging import getLogger
-
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from passlib.hash import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db.base import get_session
-from ..db.crud.users import create_user, get_by_email, get_by_id, update_user
+from ..db.crud import users
 from ..schemas.user import (
     AccountUpdateRequest,
     AuthResponse,
@@ -13,77 +11,78 @@ from ..schemas.user import (
     RegisterRequest,
     UserSchema,
 )
-from ..security.jwt import create_access_token, decode_access_token
-
-logger = getLogger(__name__)
+from ..security.jwt import create_access_token
 
 
-class AuthService:
-    def __init__(self, db: AsyncSession):
-        self.db = db
+def hash_password(password: str) -> str:
+    return bcrypt.hash(password)
 
-    async def register_user(self, data: RegisterRequest) -> AuthResponse:
-        existing_user = await get_by_email(self.db, data.email)
-        if existing_user:
-            raise HTTPException(status_code=409, detail="User already exists")
 
-        user = await create_user(
-            self.db, email=data.email, password=data.password, name=data.name
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.verify(plain, hashed)
+
+
+async def register_user(
+    data: RegisterRequest, db: AsyncSession = Depends(get_session)
+) -> AuthResponse:
+    if await users.get_by_email(db, data.email):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="User already exists"
         )
 
-        token = create_access_token(
-            {"id": user.id, "email": user.email},
+    user = await users.create_user(
+        db, email=data.email, password=data.password, name=data.name
+    )
+    return _create_auth_response(user)
+
+
+async def login_user(
+    data: LoginRequest, db: AsyncSession = Depends(get_session)
+) -> AuthResponse:
+    user = await users.get_by_email(db, data.email)
+    if not user or not bcrypt.verify(data.password, str(user.auth)):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
         )
-        return AuthResponse(token=token)
 
-    async def login_user(self, data: LoginRequest) -> AuthResponse:
-        user = await get_by_email(self.db, data.email)
-        if not user or not bcrypt.verify(data.password, str(user.auth)):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+    return _create_auth_response(user)
 
-        token = create_access_token(
-            {"id": user.id, "email": user.email},
+
+async def update_credentials(
+    user, data: AccountUpdateRequest, db: AsyncSession = Depends(get_session)
+) -> UserSchema:
+    update_data = _validate_update_request(user, data)
+    return await users.update_user(db, user, update_data)
+
+
+def _create_auth_response(user) -> AuthResponse:
+    token = create_access_token({"id": user.id, "email": user.email})
+    return AuthResponse(token=token)
+
+
+def _validate_update_request(user, data: AccountUpdateRequest) -> dict:
+    update_data = {}
+    if data.email:
+        update_data["email"] = data.email
+    if data.name:
+        update_data["name"] = data.name
+    if data.password:
+        update_data["password"] = data.password
+
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update",
         )
-        return AuthResponse(token=token)
 
-    async def update_credentials(
-        self, user, data: AccountUpdateRequest
-    ) -> UserSchema:
-        """
-        Update the user's account credentials.
-        Sensitive fields (email/password) require current password confirmation.
-        """
-        update_data = {}
-
-        # If user wants to change email or password, verify current password
-        if (data.email or data.password) and not data.current_password:
+    if "email" in update_data or "password" in update_data:
+        if not data.current_password or not bcrypt.verify(
+            data.current_password, str(user.auth)
+        ):
             raise HTTPException(
-                status_code=401, detail="Current password required"
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid current password",
             )
 
-        if data.current_password:
-            if not bcrypt.verify(data.current_password, str(user.auth)):
-                raise HTTPException(
-                    status_code=401, detail="Invalid current password"
-                )
-
-        if data.password:
-            update_data["password"] = data.password
-        if data.email:
-            update_data["email"] = data.email
-        if data.name:
-            update_data["name"] = data.name
-
-        if not update_data:
-            raise HTTPException(
-                status_code=400, detail="No valid fields to update"
-            )
-
-        updated_user = await update_user(self.db, user, update_data)
-        return updated_user
-
-
-async def get_auth_service(
-    db: AsyncSession = Depends(get_session),
-) -> AuthService:
-    return AuthService(db)
+    return update_data
