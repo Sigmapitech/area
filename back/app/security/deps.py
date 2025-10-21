@@ -1,30 +1,27 @@
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..db.crud import users
 from .jwt import decode_access_token
 
+bearer_scheme = HTTPBearer()
+
 
 async def get_current_user(
-    authorization: str = Header(...),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_session),
 ):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token isn't a bearer",
-        )
-    token = authorization.split(" ")[1]
+    token = credentials.credentials
+
     payload = decode_access_token(token)
+    user = await users.get_by_id(db, payload.id)
 
-    assert payload["id"] is not None and isinstance(
-        payload["id"], int
-    ), "Token payload must contain 'id'"
-
-    user = await users.get_by_id(db, payload["id"])
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
         )
+
     return user
