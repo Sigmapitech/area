@@ -1,5 +1,0 @@
-[security]
-jwt_secret = "dummy"
-
-[db]
-uri="sqlite+aiosqlite:///:memory:"
