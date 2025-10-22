@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db.base import get_session
 from ..db.crud import users
+from ..db.models.user import User
 from ..schemas.user import (
     AccountUpdateRequest,
     AuthResponse,
@@ -40,7 +41,7 @@ async def login_user(
     data: LoginRequest, db: AsyncSession = Depends(get_session)
 ) -> AuthResponse:
     user = await users.get_by_email(db, data.email)
-    if not user or not bcrypt.verify(data.password, str(user.auth)):
+    if not user or not verify_password(data.password, getattr(user, "auth")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
@@ -56,12 +57,12 @@ async def update_credentials(
     return await users.update_user(db, user, update_data)
 
 
-def _create_auth_response(user) -> AuthResponse:
-    token = create_access_token({"id": user.id, "email": user.email})
+def _create_auth_response(user: User) -> AuthResponse:
+    token = create_access_token({"id": getattr(user, "id"), "email": getattr(user, "email")})
     return AuthResponse(token=token)
 
 
-def _validate_update_request(user, data: AccountUpdateRequest) -> dict:
+def _validate_update_request(user: User, data: AccountUpdateRequest) -> dict:
     update_data = {}
     if data.email:
         update_data["email"] = data.email
@@ -77,8 +78,8 @@ def _validate_update_request(user, data: AccountUpdateRequest) -> dict:
         )
 
     if "email" in update_data or "password" in update_data:
-        if not data.current_password or not bcrypt.verify(
-            data.current_password, str(user.auth)
+        if not data.current_password or not verify_password(
+            data.current_password, getattr(user, "auth")
         ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
