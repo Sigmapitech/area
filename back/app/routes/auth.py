@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db.base import get_session
+from ..db.crud import users
 from ..schemas.user import (
     AccountUpdateRequest,
     AuthResponse,
@@ -11,7 +12,6 @@ from ..schemas.user import (
     RegisterRequest,
     UserSchema,
 )
-from ..db.crud import users
 from ..security.deps import get_current_user
 from ..services import auth
 
@@ -62,7 +62,9 @@ async def login_user(
         404: {"description": "User not found"},
     },
 )
-async def get_me(current_user: UserSchema = Depends(get_current_user)) -> UserSchema:
+async def get_me(
+    current_user: UserSchema = Depends(get_current_user),
+) -> UserSchema:
     return current_user
 
 
@@ -81,6 +83,7 @@ async def update_me(
     db: AsyncSession = Depends(get_session),
 ):
     return await auth.update_credentials(current_user, user, db)
+
 
 @router.delete(
     "/delete",

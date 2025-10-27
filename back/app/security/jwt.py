@@ -19,12 +19,10 @@ class TokenPayload(TypedDict):
     email: str
 
 
-
 class AccessTokenPayload(BaseModel):
     id: int
     email: str
     exp: datetime
-
 
 
 settings = get_package_config(__package__, Config)
@@ -39,9 +37,8 @@ def create_access_token(
     return jwt.encode(
         payload.model_dump(),
         settings.jwt_secret,
-        algorithm=settings.jwt_algorithm
+        algorithm=settings.jwt_algorithm,
     )
-
 
 
 def decode_access_token(token: str) -> AccessTokenPayload:

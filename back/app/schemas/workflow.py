@@ -20,14 +20,17 @@ class WorkflowNodeSchema(BaseModel):
     workflow_id: int
     config: List[WorkflowNodeConfigSchema]
 
+
 class WorkflowReadBaseSchema(BaseModel):
     id: int
     name: str
     description: Optional[str]
     owner_id: int
 
+
 class WorkflowReadOneSchema(WorkflowReadBaseSchema):
     nodes: List[WorkflowNodeSchema]
+
 
 class WorkflowReadManySchema(WorkflowReadBaseSchema):
     pass

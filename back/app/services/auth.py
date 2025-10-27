@@ -58,7 +58,9 @@ async def update_credentials(
 
 
 def _create_auth_response(user: User) -> AuthResponse:
-    token = create_access_token({"id": getattr(user, "id"), "email": getattr(user, "email")})
+    token = create_access_token(
+        {"id": getattr(user, "id"), "email": getattr(user, "email")}
+    )
     return AuthResponse(token=token)
 
 

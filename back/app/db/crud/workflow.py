@@ -89,6 +89,7 @@ async def list_workflow_nodes(
     )
     return result.scalars().all()
 
+
 async def create_workflow_node(
     db: AsyncSession,
     *,
@@ -104,6 +105,7 @@ async def create_workflow_node(
     await db.refresh(node)
     return node
 
+
 async def update_workflow_node(
     db: AsyncSession,
     node_id: int,
@@ -118,6 +120,7 @@ async def update_workflow_node(
     await db.commit()
     await db.refresh(node)
     return node
+
 
 async def delete_workflow_node(db: AsyncSession, node_id: int) -> None:
     node = await get_node_by_id(db, node_id)

@@ -141,9 +141,7 @@ async def get_workflow_nodes(
     },
 )
 async def get_one_node(
-    workflow_id: int,
-    node_id: int,
-    db: AsyncSession = Depends(get_session)
+    workflow_id: int, node_id: int, db: AsyncSession = Depends(get_session)
 ):
     wf = await workflow.get_by_id(db, workflow_id)
     if not wf:
@@ -176,6 +174,7 @@ async def create_workflow_node(
         workflow_id=workflow_id,
         config=dict(*(data.pairs or [])),
     )
+
 
 @router.patch(
     "/nodes/{node_id}",
