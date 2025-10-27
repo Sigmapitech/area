@@ -5,8 +5,14 @@ import LoginPage from "@/routes/login";
 import TestSpotifyPage from "@/routes/test-spotify";
 import { CheckAPIConnection } from "./api-guard";
 import WorkflowList from "@/routes/workflow-create";
+import Burger, { useOnClickOutside } from "./composant/burger-menu";
+import { useRef, useState } from "react";
 
 function MobileApp() {
+  const [open, setOpen] = useState(false);
+  const node = useRef<HTMLDivElement>(null);
+  useOnClickOutside(node, () => setOpen(false));
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -14,10 +20,12 @@ function MobileApp() {
           <Route path="/" element={<CheckAPIConnection />} />
           <Route path="/login" element={<LoginPage />} />
           <Route element={<LoginRequired />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/graph" element={<WorkflowList />} />
+            <Burger open={open} setOpen={setOpen}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/graph" element={<WorkflowList />} />
+              <Route path="/test-spotify" element={<TestSpotifyPage />} />
+            </Burger>
             <Route path="/graph/:id" element={<GraphPage />} />
-            <Route path="/test-spotify" element={<TestSpotifyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
