@@ -44,7 +44,7 @@ class WorkflowUpdateSchema(BaseModel):
 
 
 class WorkflowsNodeBaseSchema(BaseModel):
-    pairs: Optional[List[Tuple[str, str]]]
+    pairs: List[Tuple[str, str]] | None = None
 
 
 class WorkflowNodeCreateSchema(WorkflowsNodeBaseSchema):

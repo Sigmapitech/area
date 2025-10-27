@@ -79,3 +79,48 @@ async def get_node_by_id(
         select(WorkflowNode).where(WorkflowNode.id == node_id)
     )
     return result.scalars().first()
+
+
+async def list_workflow_nodes(
+    db: AsyncSession, workflow_id: int
+) -> Sequence[WorkflowNode]:
+    result = await db.execute(
+        select(WorkflowNode).where(WorkflowNode.workflow_id == workflow_id)
+    )
+    return result.scalars().all()
+
+async def create_workflow_node(
+    db: AsyncSession,
+    *,
+    workflow_id: int,
+    config: dict[str, str],
+) -> WorkflowNode:
+    node = WorkflowNode(
+        workflow_id=workflow_id,
+        config=WorkflowNodeConfig(**config),
+    )
+    db.add(node)
+    await db.commit()
+    await db.refresh(node)
+    return node
+
+async def update_workflow_node(
+    db: AsyncSession,
+    node_id: int,
+    *,
+    config: dict[str, str] | None = None,
+) -> WorkflowNode | None:
+    node = await get_node_by_id(db, node_id)
+    if not node:
+        return None
+    if config is not None:
+        setattr(node, "config", WorkflowNodeConfig(**config))
+    await db.commit()
+    await db.refresh(node)
+    return node
+
+async def delete_workflow_node(db: AsyncSession, node_id: int) -> None:
+    node = await get_node_by_id(db, node_id)
+    if node:
+        await db.delete(node)
+        await db.commit()
