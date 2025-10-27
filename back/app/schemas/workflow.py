@@ -65,3 +65,19 @@ class WorkflowNodeConfigCreateSchema(BaseModel):
 
 class WorkflowNodeConfigUpdateSchema(BaseModel):
     value: Optional[str]
+
+
+class WorkflowEdgeSchema(BaseModel):
+    id: int
+    from_node_id: int
+    to_node_id: int
+
+
+class WorkflowEdgeCreateSchema(BaseModel):
+    from_node_id: int
+    to_node_id: int
+
+
+class WorkflowEdgeUpdateSchema(BaseModel):
+    from_node_id: int | None = None
+    to_node_id: int | None = None

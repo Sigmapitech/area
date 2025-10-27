@@ -5,6 +5,9 @@ from ..db import get_session
 from ..db.crud import workflow
 from ..schemas.workflow import (
     WorkflowCreateSchema,
+    WorkflowEdgeCreateSchema,
+    WorkflowEdgeSchema,
+    WorkflowEdgeUpdateSchema,
     WorkflowNodeCreateSchema,
     WorkflowNodeSchema,
     WorkflowNodeUpdateSchema,
@@ -217,3 +220,103 @@ async def delete_workflow_node(
     if not existing_node:
         raise HTTPException(status_code=404, detail="Node not found")
     await workflow.delete_workflow_node(db, node_id)
+
+
+@router.get(
+    "/{workflow_id}/edges/{edge_id}",
+    response_model=WorkflowEdgeSchema,
+    responses={
+        200: {"description": "Edge retrieved successfully"},
+        404: {"description": "Workflow or Edge not found"},
+    },
+)
+async def get_workflow_edge(
+    workflow_id: int, edge_id: int, db: AsyncSession = Depends(get_session)
+):
+    wf = await workflow.get_by_id(db, workflow_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+    edge = await workflow.get_edge_by_id(db, edge_id)
+    if not edge:
+        raise HTTPException(status_code=404, detail="Edge not found")
+    return edge
+
+
+@router.get(
+    "/{workflow_id}/edges",
+    response_model=list[WorkflowEdgeSchema],
+    responses={
+        200: {"description": "Edges retrieved successfully"},
+        404: {"description": "Workflow not found"},
+    },
+)
+async def get_workflow_edges(
+    workflow_id: int, db: AsyncSession = Depends(get_session)
+):
+    wf = await workflow.get_by_id(db, workflow_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+    return await workflow.list_workflow_edges(db, workflow_id)
+
+
+@router.post(
+    "/{workflow_id}/edges",
+    responses={
+        201: {"description": "Edge created successfully"},
+        404: {"description": "Workflow not found"},
+    },
+    status_code=201,
+    response_model=WorkflowEdgeSchema,
+)
+async def create_workflow_edge(
+    workflow_id: int,
+    data: WorkflowEdgeCreateSchema,
+    db: AsyncSession = Depends(get_session),
+):
+    wf = await workflow.get_by_id(db, workflow_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+    return await workflow.create_workflow_edge(
+        db,
+        from_node_id=data.from_node_id,
+        to_node_id=data.to_node_id,
+    )
+
+
+@router.delete(
+    "/edges/{edge_id}",
+    responses={
+        204: {"description": "Edge deleted successfully"},
+        404: {"description": "Edge not found"},
+    },
+    status_code=204,
+)
+async def delete_workflow_edge(
+    edge_id: int, db: AsyncSession = Depends(get_session)
+):
+    existing_edge = await workflow.get_edge_by_id(db, edge_id)
+    if not existing_edge:
+        raise HTTPException(status_code=404, detail="Edge not found")
+    await workflow.delete_workflow_edge(db, edge_id)
+
+
+@router.patch(
+    "/edges/{edge_id}",
+    response_model=WorkflowEdgeSchema,
+    responses={
+        200: {"description": "Edge updated successfully"},
+        404: {"description": "Edge not found"},
+    },
+)
+async def update_workflow_edge(
+    edge_id: int,
+    data: WorkflowEdgeUpdateSchema,
+    db: AsyncSession = Depends(get_session),
+):
+    existing_edge = await workflow.get_edge_by_id(db, edge_id)
+    if not existing_edge:
+        raise HTTPException(status_code=404, detail="Edge not found")
+    updated_edge = await workflow.update_workflow_edge(
+        db, edge_id, **data.model_dump(exclude_unset=True)
+    )
+    return updated_edge

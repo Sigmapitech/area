@@ -4,7 +4,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ..models.workflow import Workflow, WorkflowNode, WorkflowNodeConfig
+from ..models.workflow import (
+    Workflow,
+    WorkflowEdge,
+    WorkflowNode,
+    WorkflowNodeConfig,
+)
 
 
 async def get_by_id(db: AsyncSession, workflow_id: int) -> Workflow | None:
@@ -126,4 +131,66 @@ async def delete_workflow_node(db: AsyncSession, node_id: int) -> None:
     node = await get_node_by_id(db, node_id)
     if node:
         await db.delete(node)
+        await db.commit()
+
+
+async def get_edge_by_id(
+    db: AsyncSession, edge_id: int
+) -> WorkflowEdge | None:
+    result = await db.execute(
+        select(WorkflowEdge).where(WorkflowEdge.id == edge_id)
+    )
+    return result.scalars().first()
+
+
+async def list_workflow_edges(
+    db: AsyncSession, workflow_id: int
+) -> Sequence[WorkflowEdge]:
+    result = await db.execute(
+        select(WorkflowEdge)
+        .join(WorkflowNode, WorkflowEdge.from_node_id == WorkflowNode.id)
+        .where(WorkflowNode.workflow_id == workflow_id)
+    )
+    return result.scalars().all()
+
+
+async def create_workflow_edge(
+    db: AsyncSession,
+    *,
+    from_node_id: int,
+    to_node_id: int,
+) -> WorkflowEdge:
+    edge = WorkflowEdge(
+        from_node_id=from_node_id,
+        to_node_id=to_node_id,
+    )
+    db.add(edge)
+    await db.commit()
+    await db.refresh(edge)
+    return edge
+
+
+async def update_workflow_edge(
+    db: AsyncSession,
+    edge_id: int,
+    *,
+    from_node_id: int | None = None,
+    to_node_id: int | None = None,
+) -> WorkflowEdge | None:
+    edge = await get_edge_by_id(db, edge_id)
+    if not edge:
+        return None
+    if from_node_id is not None:
+        setattr(edge, "from_node_id", from_node_id)
+    if to_node_id is not None:
+        setattr(edge, "to_node_id", to_node_id)
+    await db.commit()
+    await db.refresh(edge)
+    return edge
+
+
+async def delete_workflow_edge(db: AsyncSession, edge_id: int) -> None:
+    edge = await get_edge_by_id(db, edge_id)
+    if edge:
+        await db.delete(edge)
         await db.commit()
