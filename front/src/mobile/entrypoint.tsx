@@ -12,7 +12,6 @@ function MobileApp() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<CheckAPIConnection />} />
-
           <Route path="/login" element={<LoginPage />} />
           <Route element={<LoginRequired />}>
             <Route path="/home" element={<HomePage />} />
