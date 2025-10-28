@@ -18,6 +18,7 @@ class Config(BaseModel):
     redirect_uri: str = "http://127.0.0.1:8080/spotify/auth"
     api_base: str = "https://accounts.spotify.com"
     api_resource: str = "https://api.spotify.com/v1"
+    auth_base: str = "https://accounts.spotify.com/authorize"
     scope: str = "user-read-email"
     pkce: bool = True
 

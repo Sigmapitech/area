@@ -16,7 +16,7 @@ class Config(BaseModel):
 	client_id: str
 	client_secret: str
 	# Note: Discord's OAuth authorize/token endpoints are under /api/oauth2
-	auth_base: str = "https://discord.com/api/oauth2"
+	auth_base: str = "https://discord.com/api/oauth2/authorize"
 	token_url: str = "https://discord.com/api/oauth2/token"
 	api_base: str = "https://discord.com"
 	api_resource: str = "https://discord.com/api"

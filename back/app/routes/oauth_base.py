@@ -107,7 +107,7 @@ class OAuthProvider:
         if pkce_params:
             params.update(pkce_params)
 
-        url = f"{self.cfg.auth_base}/authorize?{urlencode(params)}"
+        url = f"{self.cfg.auth_base}?{urlencode(params)}"
         return RedirectResponse(url)
 
     async def auth(self, code: str, state: str, db: AsyncSession):
@@ -135,6 +135,7 @@ class OAuthProvider:
                 "code": code,
                 "redirect_uri": self.cfg.redirect_uri,
                 "client_id": self.cfg.client_id,
+                "client_secret": self.cfg.client_secret,
             }
             # For PKCE, include verifier and omit client_secret
             if self.cfg.pkce and code_verifier:
