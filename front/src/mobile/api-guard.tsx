@@ -15,7 +15,7 @@ export function CheckAPIConnection() {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3000);
 
-      const res = await fetch(`${API_BASE_URL}/api/hello`, {
+      const res = await fetch(`${API_BASE_URL}/hello`, {
         signal: controller.signal,
       });
       clearTimeout(timeout);

@@ -19,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    fetch(`${API_BASE_URL}/api/auth/login`, {
+    fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
