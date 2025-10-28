@@ -19,6 +19,7 @@ class Config(BaseModel):
     api_base: str = "https://accounts.spotify.com"
     api_resource: str = "https://api.spotify.com/v1"
     scope: str = "user-read-email"
+    pkce: bool = True
 
 
 router = APIRouter(prefix="/spotify", tags=["spotify"])
