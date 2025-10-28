@@ -1,30 +1,26 @@
 from logging import getLogger
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...db.base import AsyncSession, get_session
-from ...db.crud import users
-from ...schemas import AuthResponse, UserSchema
-from ...schemas.user import (
-    AccountUpdatePasswordRequest,
+from ..db.base import get_session
+from ..db.crud import users
+from ..schemas.user import (
     AccountUpdateRequest,
+    AuthResponse,
     LoginRequest,
     RegisterRequest,
+    UserSchema,
 )
-from ...security.deps import get_current_user
-from ...services.auth import AuthService, get_auth_service
+from ..security.deps import get_current_user
+from ..services import auth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = getLogger(__name__)
 
 
-class VerificationRequest(BaseModel):
-    code: int
-
-
 @router.post(
-    "/register/",
+    "/register",
     response_model=AuthResponse,
     description="Register a new account",
     status_code=201,
@@ -35,24 +31,25 @@ class VerificationRequest(BaseModel):
 )
 async def register_user(
     data: RegisterRequest,
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.register_user(data)
+    return await auth.register_user(data, db)
 
 
 @router.post(
-    "/login/",
+    "/login",
     response_model=AuthResponse,
     description="Login with account",
     responses={
         200: {"model": AuthResponse, "description": "Login successful"},
+        401: {"description": "Invalid credentials"},
     },
 )
 async def login_user(
     data: LoginRequest,
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.login_user(data)
+    return await auth.login_user(data, db)
 
 
 @router.get(
@@ -72,7 +69,7 @@ async def get_me(
 
 
 @router.patch(
-    "/me",
+    "/credentials",
     response_model=UserSchema,
     description="Update current user",
     responses={
@@ -82,26 +79,23 @@ async def get_me(
 )
 async def update_me(
     user: AccountUpdateRequest,
-    db: AsyncSession = Depends(get_session),
     current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
 ):
-    user = await users.update_user(db, current_user, user.model_dump())
-
-    return user
+    return await auth.update_credentials(current_user, user, db)
 
 
-@router.post(
-    "/update-password",
-    response_model=UserSchema,
-    description="Update current user",
+@router.delete(
+    "/delete",
+    description="Delete current user account",
     responses={
-        200: {"model": UserSchema, "description": "Current user data"},
+        204: {"description": "Account deleted successfully"},
         401: {"description": "Unauthorized"},
     },
+    status_code=204,
 )
-async def update_password(
-    data: AccountUpdatePasswordRequest,
+async def delete_me(
     current_user=Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service),
+    db: AsyncSession = Depends(get_session),
 ):
-    return await auth_service.update_user_password(current_user, data)
+    await users.delete_user(db, current_user.id)

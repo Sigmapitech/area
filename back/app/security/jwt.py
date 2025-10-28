@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
+from typing import TypedDict
 
 import jwt
 from fastapi import HTTPException, status
@@ -11,29 +11,43 @@ from ..config import get_package_config
 class Config(BaseModel):
     jwt_secret: str
     jwt_algorithm: str = "HS256"
-    jwt_expires_minutes: int = 42
+    jwt_expires_minutes: int = 600
+
+
+class TokenPayload(TypedDict):
+    id: int
+    email: str
+
+
+class AccessTokenPayload(BaseModel):
+    id: int
+    email: str
+    exp: datetime
 
 
 settings = get_package_config(__package__, Config)
 
 
 def create_access_token(
-    data: Dict[str, Any], expires_minutes: int = settings.jwt_expires_minutes
+    data: TokenPayload, expires_minutes: int = settings.jwt_expires_minutes
 ) -> str:
-    to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=expires_minutes)
-    to_encode.update({"exp": expire})
+
+    payload = AccessTokenPayload(exp=expire, **data)
     return jwt.encode(
-        to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm
+        payload.model_dump(),
+        settings.jwt_secret,
+        algorithm=settings.jwt_algorithm,
     )
 
 
-def decode_access_token(token: str) -> Dict[str, Any]:
+def decode_access_token(token: str) -> AccessTokenPayload:
     try:
         payload = jwt.decode(
             token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
         )
-        return payload
+
+        return AccessTokenPayload(**payload)
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(

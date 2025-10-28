@@ -1,16 +1,8 @@
 import re
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints
-
-
-class UserSchema(BaseModel):
-    id: int
-    email: str
-    name: str
-
-    model_config = ConfigDict(from_attributes=True)
-
 
 PasswordStr = Annotated[
     str,
@@ -25,6 +17,20 @@ PasswordStr = Annotated[
 ]
 
 
+class UserSchema(BaseModel):
+    id: int
+    email: str
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AuthResponse(BaseModel):
+    token: str
+
+
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: PasswordStr
@@ -34,16 +40,10 @@ class RegisterRequest(BaseModel):
 class AccountUpdateRequest(BaseModel):
     email: EmailStr | None = None
     name: str | None = None
-
-
-class AccountUpdatePasswordRequest(BaseModel):
-    new_password: str
+    password: PasswordStr | None = None
+    current_password: PasswordStr | None = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: str
-
-
-class AuthResponse(BaseModel):
-    token: str
+    password: PasswordStr

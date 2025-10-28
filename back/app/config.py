@@ -2,7 +2,7 @@ import os
 import tomllib
 from typing import Any, Type, TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 CONFIG_PATH = os.getenv("AREA_CONFIG_PATH", "config.toml")
 
@@ -30,7 +30,6 @@ def fire_once(func):
 def get_config() -> dict[str, Any]:
     assert os.path.exists(CONFIG_PATH), f"{CONFIG_PATH} does not exist."
 
-    print(CONFIG_PATH)
     with open(CONFIG_PATH, "rb") as f:
         config = tomllib.load(f)
     return config

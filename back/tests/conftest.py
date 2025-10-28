@@ -1,16 +1,18 @@
+import asyncio
 import os
-from http import HTTPStatus
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
+from app.db.base import Base, get_session
+from app.db.crud.users import create_user
 from app.main import app
-
-USER = {
-    "name": "test",
-    "email": "test@test.com",
-    "password": "Test1234!",
-}
+from app.security.jwt import create_access_token
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -18,39 +20,52 @@ def set_testing_env():
     os.environ["AREA_CONFIG_PATH"] = "testing.toml"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def client():
     with TestClient(app) as c:
         yield c
 
 
-@pytest.fixture(scope="session")
-def registered_user(client):
-    resp = client.post("/api/auth/register/", json=USER)
-    assert resp.status_code == HTTPStatus.CREATED
-    return USER
-
-
-@pytest.fixture(scope="session")
-def auth_headers(client, registered_user):
-    resp = client.post(
-        "/api/auth/login/",
-        json={
-            "email": registered_user["email"],
-            "password": registered_user["password"],
-        },
+@pytest.fixture
+def override_db():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async_session = async_sessionmaker(
+        engine, expire_on_commit=False, class_=AsyncSession
     )
 
-    assert resp.status_code == HTTPStatus.OK
-    token = resp.json().get("token")
-    assert token
-    return {"Authorization": f"Bearer {token}"}
+    async def init_models():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    async def get_session_instance():
+        async with async_session() as session:
+            return session
+
+    session = asyncio.run(get_session_instance())
+
+    async def test_session():
+        yield session
+
+    asyncio.run(init_models())
+    app.dependency_overrides[get_session] = test_session
+    yield session
+    app.dependency_overrides.clear()
+    asyncio.run(engine.dispose())
 
 
 @pytest.fixture
-def workflow(client, auth_headers):
-    """Create a fresh workflow for a test."""
-    wf_payload = {"name": "My graph", "description": "Demo workflow"}
-    resp = client.post("/api/workflow", json=wf_payload, headers=auth_headers)
-    assert resp.status_code == HTTPStatus.CREATED
-    return resp.json()
+def auth_header(override_db):
+    registered_user = asyncio.run(
+        create_user(
+            db=override_db,
+            email="pytest_user@test.com",
+            name="Pytest User",
+            password="Pytest1234!",
+        )
+    )
+
+    token = create_access_token(
+        {"id": registered_user.id, "email": registered_user.email}
+    )
+
+    return {"Authorization": f"Bearer {token}"}

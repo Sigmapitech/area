@@ -39,12 +39,18 @@
               enable = true;
               name = "biome hook (format only)";
               entry = ''
-                ${lib.getExe pkgs.biome} format --write ./.
+                ${lib.getExe pkgs.biome} format --write ./front
+              '';
+            };
+            black = {
+              enable = true;
+              name = "black hook";
+              entry = ''
+                ${lib.getExe self.formatter.${pkgs.system}} ./back
               '';
             };
           }
           // lib.genAttrs [
-            "black"
             "convco"
             "isort"
             "trim-trailing-whitespace"

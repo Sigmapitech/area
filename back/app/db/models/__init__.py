@@ -1,5 +1,4 @@
-from .graph import Workflow, WorkflowNode
-from .oauth import UserToken
 from .user import User
+from .workflow import Workflow, WorkflowNode, WorkflowNodeConfig
 
-__all__ = ("User", "Workflow", "WorkflowNode", "UserToken")
+__all__ = ("User", "Workflow", "WorkflowNode", "WorkflowNodeConfig")

@@ -35,6 +35,7 @@ python3Packages.buildPythonApplication {
       pytest-env
       pytest-cov
       pytest-xdist
+      pytest-asyncio
     ];
   };
 
@@ -42,6 +43,7 @@ python3Packages.buildPythonApplication {
     pytestCheckHook
     pytest-env
     pytest-cov-stub
+    pytest-asyncio
   ];
 
   meta = {

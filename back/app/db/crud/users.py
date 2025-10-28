@@ -1,9 +1,9 @@
 from typing import Sequence
 
-from passlib.hash import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from ...services.auth import hash_password
 from ..models.user import User
 
 
@@ -52,7 +52,7 @@ async def create_user(
     Returns:
         User: Newly created user instance
     """
-    hashed_password = bcrypt.hash(password)
+    hashed_password = hash_password(password)
     user = User(email=email, auth=hashed_password, name=name)
     db.add(user)
     await db.commit()
@@ -80,15 +80,18 @@ async def list_users(
 
 async def update_user(db: AsyncSession, user: User, data: dict):
     for key, value in data.items():
-        setattr(user, key, value)
+        if key == "password":
+            hash = hash_password(value)
+            setattr(user, "auth", hash)
+        else:
+            setattr(user, key, value)
     await db.commit()
     await db.refresh(user)
     return user
 
 
-async def update_password(db: AsyncSession, user: User, new_password: str):
-    setattr(user, "auth", bcrypt.hash(new_password))
-
-    await db.commit()
-    await db.refresh(user)
-    return user
+async def delete_user(db: AsyncSession, user_id: int):
+    user = await get_by_id(db, user_id)
+    if user:
+        await db.delete(user)
+        await db.commit()
