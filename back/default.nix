@@ -22,6 +22,7 @@ python3Packages.buildPythonApplication {
     sqlalchemy
     sqlmodel
     uvicorn
+    httpx
   ];
 
   optional-dependencies = with python3Packages; {
