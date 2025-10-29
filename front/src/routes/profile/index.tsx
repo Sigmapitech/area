@@ -13,7 +13,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`${API_BASE_URL}/api/auth/me`, {
+    fetch(`${API_BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
@@ -34,7 +34,7 @@ export default function ProfilePage() {
       return;
     }
     console.log(JSON.stringify({ email, name }));
-    fetch(`${API_BASE_URL}/api/auth/me`, {
+    fetch(`${API_BASE_URL}/auth/me`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

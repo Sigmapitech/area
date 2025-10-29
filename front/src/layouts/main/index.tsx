@@ -15,7 +15,7 @@ export default function MainLayout() {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`${API_BASE_URL}/api/auth/me`, {
+    fetch(`${API_BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())

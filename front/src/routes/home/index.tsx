@@ -23,7 +23,7 @@ export default function HomePage() {
     const [width, height, left, top] = getPopupDimension();
 
     const popup = window.open(
-      `${API_BASE_URL}/api/discord/connect?token=${token}`,
+      `${API_BASE_URL}/discord/connect?token=${token}`,
       "DiscordConnect",
       `width=${width},height=${height},left=${left},top=${top}`
     );
@@ -40,7 +40,7 @@ export default function HomePage() {
 
   const fetchGuilds = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/discord/list_guilds`, {
+      const res = await fetch(`${API_BASE_URL}/discord/list_guilds`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

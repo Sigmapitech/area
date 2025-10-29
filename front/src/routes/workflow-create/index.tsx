@@ -23,7 +23,7 @@ export default function WorkflowList() {
     if (!newWorkflow.name.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/workflow`, {
+      const response = await fetch(`${API_BASE_URL}/workflow`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export default function WorkflowList() {
     if (!confirm("Delete this workflow?")) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/workflow/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/workflow/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,20 +61,16 @@ export default function WorkflowList() {
   };
 
   useEffect(() => {
-    const fetchWorkflows = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/workflow`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
+    fetch(`${API_BASE_URL}/workflow`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
         setWorkflows(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
         setLoading(false);
-      }
-    };
-    fetchWorkflows();
+      })
+      .catch((e) => console.error(e));
   }, [token]);
 
   if (loading) return <div className="workflow-list__loading">Loading...</div>;

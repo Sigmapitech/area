@@ -56,7 +56,7 @@ export default function GraphPage() {
         const sourceNodeId = params.source;
 
         const res = await fetch(
-          `${API_BASE_URL}/api/workflow/${workflowId}/${targetNodeId}`,
+          `${API_BASE_URL}/workflow/${workflowId}/${targetNodeId}`,
           {
             method: "PATCH",
             headers: {
@@ -98,7 +98,7 @@ export default function GraphPage() {
     const fetchNodes = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/api/workflow/${workflowId}`, {
+        const res = await fetch(`${API_BASE_URL}/workflow/${workflowId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -152,7 +152,7 @@ export default function GraphPage() {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/workflow/${workflowId}`, {
+      const res = await fetch(`${API_BASE_URL}/workflow/${workflowId}/nodes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

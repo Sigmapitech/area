@@ -41,7 +41,7 @@ export default function RegisterPage() {
       return;
     }
 
-    fetch(`${API_BASE_URL}/api/auth/register`, {
+    fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
