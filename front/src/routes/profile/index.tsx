@@ -59,22 +59,27 @@ export default function ProfilePage() {
   };
 
   return (
-    <form className="profile-page" onSubmit={handleSubmit}>
-      <h2>Profile</h2>
-      <hr />
-      <p>name</p>
-      <input
-        type="text"
-        value={name || ""}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <p>email</p>
-      <input
-        type="text"
-        value={email || ""}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input type="submit" value="Update Profile" />
-    </form>
+    <div className="profile-wrapper">
+      <div className="profile-container">
+        <h1>Profile</h1>
+        <form className="profile-form" onSubmit={handleSubmit}>
+          <input
+            placeholder="Name"
+            required
+            type="text"
+            value={name || ""}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            placeholder="Email"
+            required
+            type="email"
+            value={email || ""}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <button type="submit">Update Profile</button>
+        </form>
+      </div>
+    </div>
   );
 }
