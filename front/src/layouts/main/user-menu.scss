@@ -1,0 +1,31 @@
+.user-menu {
+  position: absolute;
+  top: 100%;
+  right: 1em;
+  background-color: #1e1e2e;
+  border: 1px solid #313244;
+  z-index: 1000;
+
+  & ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  & a {
+    display: flex;
+    gap: 1ch;
+  }
+
+  & li {
+    display: flex;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0.5em 1em;
+    gap: 1ch;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
