@@ -22,7 +22,7 @@ export default function TestSpotifyPage() {
     const [width, height, left, top] = getPopupDimension();
 
     const popup = window.open(
-      `${API_BASE_URL}/providers/spotify/connect?token=${token}`,
+      `${API_BASE_URL}/spotify/connect?token=${token}`,
       "DiscordConnect",
       `width=${width},height=${height},left=${left},top=${top}`
     );
@@ -40,7 +40,7 @@ export default function TestSpotifyPage() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/providers/spotify/me`, {
+      const res = await fetch(`${API_BASE_URL}/spotify/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
