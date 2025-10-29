@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from . import (
     auth,
+    caldav,
     discord,
     gmail,
     hello,
@@ -19,6 +20,7 @@ for mod in (
     spotify,
     discord,
     gmail,
+    caldav,
     youtube
 ):
     assert hasattr(
