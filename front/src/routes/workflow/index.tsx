@@ -19,16 +19,15 @@ import "./style.scss";
 
 interface WorkflowNode {
   id: number;
-  parent_id: number | null;
-  node_type: string;
-  content?: string;
+  node_id: number | null;
+  key: string;
+  value?: string;
 }
 
 interface WorkflowDetail {
   id: number;
-  name: string;
-  description?: string | null;
-  nodes: WorkflowNode[];
+  workflow_id: number;
+  config: WorkflowNode[];
 }
 
 const nodeDefaults = {
@@ -42,6 +41,13 @@ export default function GraphPage() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const [indivNode, setNode] = useState<WorkflowNode>({
+    id: 0,
+    node_id: null,
+    key: "",
+    value: "",
+  });
 
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +87,7 @@ export default function GraphPage() {
               ? {
                   ...n,
                   data: {
-                    label: `${updatedNode.node_type} (${updatedNode.id})`,
+                    label: `${updatedNode.key} (${updatedNode.id})`,
                   },
                 }
               : n
@@ -109,21 +115,21 @@ export default function GraphPage() {
 
         const data: WorkflowDetail = await res.json();
 
-        const fetchedNodes = data.nodes.map((node, index) => ({
+        const fetchedNodes = data.config.map((node, index) => ({
           id: node.id.toString(),
-          data: { label: `${node.node_type} (${node.id})` },
+          data: { label: `${node.key} (${node.id})` },
           position: {
-            x: (node.parent_id ?? 0) * 200,
+            x: (node.node_id ?? 0) * 200,
             y: index * 120,
           },
           ...nodeDefaults,
         }));
 
-        const fetchedEdges = data.nodes
-          .filter((n) => n.parent_id)
+        const fetchedEdges = data.config
+          .filter((n) => n.node_id)
           .map((n) => ({
-            id: `e${n.parent_id}-${n.id}`,
-            source: n.parent_id?.toString(),
+            id: `e${n.node_id}-${n.id}`,
+            source: n.node_id?.toString(),
             target: n.id.toString(),
             animated: true,
           }));
@@ -143,7 +149,7 @@ export default function GraphPage() {
   const handleAddNode = useCallback(async () => {
     if (!workflowId || !token) return;
 
-    const newId = (nodes.length + 1).toString();
+    const newId = nodes.length + 1;
     const newNode = {
       id: newId,
       data: { label: `New Node (${newId})` },
@@ -159,9 +165,10 @@ export default function GraphPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          parent_id: null,
-          node_type: "send",
-          content: {},
+          id: newNode.id,
+          node_id: null,
+          key: "send",
+          value: {},
         }),
       });
 
@@ -177,7 +184,7 @@ export default function GraphPage() {
         {
           ...newNode,
           id: savedNode.id.toString(),
-          data: { label: `${savedNode.node_type} (${savedNode.id})` },
+          data: { label: `${savedNode.key} (${savedNode.id})` },
         },
       ]);
     } catch (err) {
