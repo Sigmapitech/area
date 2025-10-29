@@ -10,13 +10,10 @@ importers:
     dependencies:
       '@capacitor/android':
         specifier: ^7.4.3
-        version: 7.4.3(@capacitor/core@7.4.3)
-      '@capacitor/cli':
-        specifier: ^7.4.3
-        version: 7.4.3
-      '@capacitor/core':
-        specifier: ^7.4.3
-        version: 7.4.3
+        version: 7.4.3(@capacitor/core@7.4.4)
+      '@capacitor/app':
+        specifier: ^7.1.0
+        version: 7.1.0(@capacitor/core@7.4.4)
       '@xyflow/react':
         specifier: ^12.8.5
         version: 12.8.6(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -30,6 +27,12 @@ importers:
         specifier: ^7.9.1
         version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
+      '@capacitor/cli':
+        specifier: ^7.4.3
+        version: 7.4.3
+      '@capacitor/core':
+        specifier: ^7.4.4
+        version: 7.4.4
       '@types/node':
         specifier: ^24.3.1
         version: 24.5.2
@@ -145,13 +148,18 @@ packages:
     peerDependencies:
       '@capacitor/core': ^7.4.0
 
+  '@capacitor/app@7.1.0':
+    resolution: {integrity: sha512-W7m09IWrUjZbo7AKeq+rc/KyucxrJekTBg0l4QCm/yDtCejE3hebxp/W2esU26KKCzMc7H3ClkUw32E9lZkwRA==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
   '@capacitor/cli@7.4.3':
     resolution: {integrity: sha512-SWozpdDgrbQ/ry1nIapugDFvE9z+l22BmU/+fpgL2Zv5487hGdXvCX5+1SluuFBP3IPpx6b4LjsKnBigyJoUWg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  '@capacitor/core@7.4.3':
-    resolution: {integrity: sha512-wCWr8fQ9Wxn0466vPg7nMn0tivbNVjNy1yL4GvDSIZuZx7UpU2HeVGNe9QjN/quEd+YLRFeKEBLBw619VqUiNg==}
+  '@capacitor/core@7.4.4':
+    resolution: {integrity: sha512-xzjxpr+d2zwTpCaN0k+C6wKSZzWFAb9OVEUtmO72ihjr/NEDoLvsGl4WLfjWPcCO2zOy0b2X52tfRWjECFUjtw==}
 
   '@esbuild/aix-ppc64@0.25.10':
     resolution: {integrity: sha512-0NFWnA+7l41irNuaSVlLfgNT12caWJVLzp5eAVhZ0z1qpxbockccEt3s+149rE64VUI3Ml2zt8Nv5JVc4QXTsw==}
@@ -1532,9 +1540,13 @@ snapshots:
 
   '@bufbuild/protobuf@2.9.0': {}
 
-  '@capacitor/android@7.4.3(@capacitor/core@7.4.3)':
+  '@capacitor/android@7.4.3(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
+
+  '@capacitor/app@7.1.0(@capacitor/core@7.4.4)':
+    dependencies:
+      '@capacitor/core': 7.4.4
 
   '@capacitor/cli@7.4.3':
     dependencies:
@@ -1558,7 +1570,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@7.4.3':
+  '@capacitor/core@7.4.4':
     dependencies:
       tslib: 2.8.1
 
