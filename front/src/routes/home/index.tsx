@@ -60,7 +60,7 @@ export default function HomePage() {
     <StrictMode>
       <div className="home-page">
         <div className="buttons">
-          <Link to="/graph">Graph page</Link>
+          <Link to="/workflow">Graph page</Link>
           <Link to="/test-spotify">Spotify test</Link>
           <button type="button" onClick={logout}>
             Logout

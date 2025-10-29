@@ -1,18 +1,113 @@
-.workflow {
+.workflow-wrapper {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 2rem;
+}
+
+.workflow-list {
+  max-width: 800px;
+
+  h1 {
+    padding-bottom: 1em;
+    font-size: 1.8rem;
+    margin: 0;
+  }
+
+  &__loading {
+    text-align: center;
+    padding: 2rem;
+    color: #777;
+  }
+}
+
+.workflow-create-form {
   display: flex;
-  gap: 1em;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 
-  &-create-form {
-    display: flex;
-    gap: 1em;
+  input {
+    background-color: #313244;
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #585b70;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
 
-    input {
-      padding: 1em;
+    &:focus {
+      border-color: #96bfff;
+      outline: none;
     }
   }
 
-  p {
-    width: 100%;
-    text-align: left;
+}
+
+.workflow-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .workflow-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 1.2rem;
+    border: 1px solid #7f849c;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: #1e1e2e;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    &__main {
+      flex: 1;
+      h3 {
+        margin: 0 0 0.4rem 0;
+        font-size: 1.1rem;
+      }
+      p {
+        margin: 0;
+        color: #a6adc8;
+        font-size: 0.95rem;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      .view-btn,
+      .delete-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .view-btn {
+        background: #96bfff;
+        color: black;
+
+        &:hover {
+          background: #6488c0;
+        }
+      }
+
+      .delete-btn {
+        background: #ff5c5c;
+        color: black;
+        &:hover {
+          background: #e04444;
+        }
+      }
+    }
   }
 }

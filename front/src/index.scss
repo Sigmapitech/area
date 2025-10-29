@@ -23,7 +23,7 @@ body, #root {
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #7f849c;
   text-decoration: inherit;
 
   &:hover {
@@ -43,12 +43,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #313244;
   cursor: pointer;
   transition: border-color 0.25s;
 
   &:hover {
-    border-color: #646cff;
+    border-color: #7f849c;
   }
 
   &:focus, &:focus-visible {

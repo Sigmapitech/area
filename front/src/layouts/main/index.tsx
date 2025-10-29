@@ -96,9 +96,7 @@ export default function MainLayout() {
         )}
       </header>
 
-      <main className="main-content">
-        <Outlet />
-      </main>
+      <Outlet />
     </div>
   );
 }
