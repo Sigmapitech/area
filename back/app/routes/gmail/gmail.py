@@ -1,9 +1,10 @@
 import base64
+import json
 import logging
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -176,3 +177,73 @@ async def gmail_last_email(
 		"body_text": body_text,
 	}
 
+@router.post("/watch")
+async def gmail_watch(
+    user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    token = await _get_gmail_token(user.id, db)
+    if not token:
+        raise HTTPException(status_code=401, detail="Gmail not connected")
+
+    headers = {"Authorization": f"Bearer {token.access_token}"}
+    body = {
+        "topicName": "projects/area-476516/topics/gmail-notifications",
+        "labelIds": ["INBOX"],  # optional: limit to inbox
+    }
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            f"https://gmail.googleapis.com/gmail/v1/users/me/watch",
+            headers=headers,
+            json=body,
+        )
+        if resp.status_code == 401:
+            await provider.refresh(user=user, db=db)
+            #update token after refresh
+            headers = {"Authorization": f"Bearer {token.access_token}"}
+            resp = await client.post(
+                f"https://gmail.googleapis.com/gmail/v1/users/me/watch",
+                headers=headers,
+                json=body,
+            )
+
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=resp.status_code,
+            detail=f"Failed to start Gmail watch: {resp.text}",
+        )
+
+    data = resp.json()
+    # Save the historyId somewhere (e.g., in DB)
+    logger.info("Started Gmail watch: %s", data)
+    return data
+
+@router.post("/notifications")
+async def gmail_notifications(request: Request):
+    """
+    Receives push notifications from Gmail via Pub/Sub.
+    """
+    envelope = await request.json()
+    message = envelope.get("message")
+    if not message:
+        logger.warning("No Pub/Sub message in request")
+        return {"status": "no message"}
+
+    data_b64 = message.get("data")
+    if not data_b64:
+        logger.warning("Missing data in Pub/Sub message")
+        return {"status": "no data"}
+
+    decoded = base64.b64decode(data_b64).decode("utf-8")
+    payload = json.loads(decoded)
+
+    email = payload.get("emailAddress")
+    history_id = payload.get("historyId")
+    logger.info(f"Gmail change for {email} - historyId: {history_id}")
+    logger.debug(f"Gmail notification payload: {payload}")
+
+    # TODO: fetch new messages (see below)
+    # await process_gmail_history(email, history_id)
+
+    return {"status": "ok"}

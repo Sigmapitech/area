@@ -204,8 +204,8 @@ class OAuthProvider:
                 "client_id": self.cfg.client_id,
             }
             # For PKCE-based public clients (e.g., mobile), omit client_secret on refresh
-            if not self.cfg.pkce:
-                data["client_secret"] = self.cfg.client_secret
+            # if not self.cfg.pkce:
+            data["client_secret"] = self.cfg.client_secret
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
             resp = await client.post(
                 self.cfg.token_url, data=data, headers=headers
