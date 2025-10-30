@@ -10,10 +10,19 @@ importers:
     dependencies:
       '@capacitor/android':
         specifier: ^7.4.3
-        version: 7.4.3(@capacitor/core@7.4.4)
+        version: 7.4.3(@capacitor/core@7.4.3)
       '@capacitor/app':
         specifier: ^7.1.0
-        version: 7.1.0(@capacitor/core@7.4.4)
+        version: 7.1.0(@capacitor/core@7.4.3)
+      '@capacitor/browser':
+        specifier: ^7.0.2
+        version: 7.0.2(@capacitor/core@7.4.3)
+      '@capacitor/cli':
+        specifier: ^7.4.3
+        version: 7.4.3
+      '@capacitor/core':
+        specifier: ^7.4.3
+        version: 7.4.3
       '@xyflow/react':
         specifier: ^12.8.5
         version: 12.8.6(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -150,6 +159,11 @@ packages:
 
   '@capacitor/app@7.1.0':
     resolution: {integrity: sha512-W7m09IWrUjZbo7AKeq+rc/KyucxrJekTBg0l4QCm/yDtCejE3hebxp/W2esU26KKCzMc7H3ClkUw32E9lZkwRA==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/browser@7.0.2':
+    resolution: {integrity: sha512-5kySTunCtH+2sezmTjgDfwvspW7GW/hslQECZeLIRM2qefnxjGTc3fmCTeILYK5EuvcxMs+8sF5BhmzzKqOzuQ==}
     peerDependencies:
       '@capacitor/core': '>=7.0.0'
 
@@ -1547,6 +1561,14 @@ snapshots:
   '@capacitor/app@7.1.0(@capacitor/core@7.4.4)':
     dependencies:
       '@capacitor/core': 7.4.4
+
+  '@capacitor/app@7.1.0(@capacitor/core@7.4.3)':
+    dependencies:
+      '@capacitor/core': 7.4.3
+
+  '@capacitor/browser@7.0.2(@capacitor/core@7.4.3)':
+    dependencies:
+      '@capacitor/core': 7.4.3
 
   '@capacitor/cli@7.4.3':
     dependencies:

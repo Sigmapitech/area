@@ -11,6 +11,9 @@
   "dependencies": {
     "@capacitor/android": "^7.4.3",
     "@capacitor/app": "^7.1.0",
+    "@capacitor/browser": "^7.0.2",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "@xyflow/react": "^12.8.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
