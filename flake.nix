@@ -120,13 +120,21 @@
         pkgs.mkShell {
           inputsFrom = [self.devShells.${pkgs.system}.base];
 
-          env.ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
+          env = {
+            ANDROID_SDK_ROOT = "${compo'.androidsdk}/libexec/android-sdk";
+            CAPACITOR_ANDROID_STUDIO_PATH = "${lib.getExe pkgs.android-studio}";
+          };
 
-          packages = with compo'; [
-            androidsdk
-            emulator
-            platform-tools
-          ];
+          packages = with compo';
+            [
+              androidsdk
+              emulator
+              platform-tools
+            ]
+            ++ (with pkgs; [
+              lsof
+              android-studio
+            ]);
         };
     });
 
