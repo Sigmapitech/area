@@ -4,6 +4,14 @@ const config: CapacitorConfig = {
   appId: "io.github.sigmapitech",
   appName: "Area",
   webDir: "dist",
+  server: {
+    androidScheme: "https",
+  },
+  plugins: {
+    App: {
+      urlSchemes: ["area"],
+    },
+  },
 };
 
 export default config;

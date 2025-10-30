@@ -7,8 +7,13 @@ import TestSpotifyPage from "@/routes/test-spotify";
 import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
 import { CheckAPIConnection } from "./api-guard";
+import { App } from "@capacitor/app";
 
 function MobileApp() {
+  App.addListener("appUrlOpen", (data) => {
+    console.log("Deep link received:", data.url);
+  });
+
   return (
     <AuthProvider>
       <BrowserRouter>
