@@ -134,6 +134,7 @@
             ++ (with pkgs; [
               lsof
               android-studio
+              chromium
             ]);
         };
     });
