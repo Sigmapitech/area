@@ -72,11 +72,14 @@ class OAuthProvider:
 
     # ---- Shared endpoints implementations ----
 
-    async def connect(self, token: str):
+    async def connect(self, token: str, platform: str):
+        print(platform)
+
         state = str(uuid.uuid4())
         # Prepare PKCE if enabled
         code_verifier = None
         pkce_params: dict[str, str] = {}
+
         if self.cfg.pkce:
             # Generate a high-entropy code_verifier (64 chars)
             code_verifier = secrets.token_urlsafe(64)[:128]
@@ -92,6 +95,7 @@ class OAuthProvider:
         self._state_store[state] = {
             "token": token,
             "code_verifier": code_verifier,
+            "platform": platform,
         }
 
         params: dict[str, str] = {
@@ -168,6 +172,31 @@ class OAuthProvider:
         db.add(token)
         await db.commit()
         await db.refresh(token)
+
+        if state_payload["platform"] == "mobile":
+            package = "io.github.sigmapitech"
+            # redirect_uri = f"intent://callback?code={code}#Intent;scheme=area;end"
+            redirect_uri = f"area://callback?code={code}"
+            # return RedirectResponse(url=redirect_uri)
+
+            html = f"""
+                <html>
+                  <body>
+                    <script>
+                    window.location.href = "{redirect_uri}";
+                    window.opener.postMessage(
+                    {{
+                        type: '{self.cfg.service.upper()}_CONNECTED',
+                        payload: {{ userId: {user.id} }}
+                    }},
+                    "*"
+                    );
+                    </script>
+                <p>Redirecting back to app...</p>
+                </body>
+            </html>
+            """
+            return HTMLResponse(content=html)
 
         return HTMLResponse(
             content=f"""
