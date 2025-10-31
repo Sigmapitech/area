@@ -3,6 +3,9 @@ import { StrictMode, useState } from "react";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
+import { App } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+
 function getPopupDimension() {
   const width = 500;
   const height = 700;
@@ -19,23 +22,63 @@ export default function TestSpotifyPage() {
   const [spotifyData, setData] = useState<object>({});
 
   const connectDiscord = () => {
-    const [width, height, left, top] = getPopupDimension();
+    if (__APP_PLATFORM__ == "mobile") {
+      window.addEventListener("message", (event) => {
+        console.log(event.data?.type);
+        if (event.data?.type === "SPOTIFY_CONNECTED") {
+          setConnected(true);
+          console.log("linked!", event.data.payload);
+          fetchData();
+        }
+      });
 
-    const popup = window.open(
-      `${API_BASE_URL}/spotify/connect?token=${token}`,
-      "DiscordConnect",
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+      App.addListener("appUrlOpen", async (data) => {
+        console.log("Deep link opened:", data.url);
+        const url = new URL(data.url);
+        const code = url.searchParams.get("code");
 
-    window.addEventListener("message", (event) => {
-      console.log(event.data?.type);
-      if (event.data?.type === "SPOTIFY_CONNECTED") {
-        setConnected(true);
-        console.log("linked!", event.data.payload);
-        popup?.close();
-        fetchData();
-      }
-    });
+        if (code) {
+          await Browser.close();
+          console.log("Got Spotify code:", code ?? "no-code");
+          setConnected(true);
+          fetchData();
+        }
+      });
+
+      console.log("opening browser");
+      Browser.open({
+        url: `${API_BASE_URL}/spotify/connect?token=${token}&platform=${__APP_PLATFORM__}`,
+      })
+        .then(() => {
+          console.log("end");
+        })
+        .catch((e) => {
+          console.log("nope", e);
+        });
+      const [width, height, left, top] = getPopupDimension();
+      const popup = window.open(
+        `${API_BASE_URL}/spotify/connect?token=${token}&platform=${__APP_PLATFORM__}`,
+        "DiscordConnect",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+    } else {
+      const [width, height, left, top] = getPopupDimension();
+      const popup = window.open(
+        `${API_BASE_URL}/spotify/connect?token=${token}&platform=${__APP_PLATFORM__}`,
+        "_system",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      window.addEventListener("message", (event) => {
+        console.log(event.data?.type);
+        if (event.data?.type === "SPOTIFY_CONNECTED") {
+          setConnected(true);
+          console.log("linked!", event.data.payload);
+          popup?.close();
+          fetchData();
+        }
+      });
+    }
   };
 
   const fetchData = async () => {
