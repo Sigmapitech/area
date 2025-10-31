@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -82,6 +83,7 @@ async def get_node_by_id(
 ) -> WorkflowNode | None:
     result = await db.execute(
         select(WorkflowNode).where(WorkflowNode.id == node_id)
+        .options(selectinload(WorkflowNode.config))
     )
     return result.scalars().first()
 
@@ -103,11 +105,19 @@ async def create_workflow_node(
 ) -> WorkflowNode:
     node = WorkflowNode(
         workflow_id=workflow_id,
-        config=WorkflowNodeConfig(**config),
     )
+    if config:
+        node.config = [WorkflowNodeConfig(key=k, value=v) for k, v in config.items()]
     db.add(node)
     await db.commit()
     await db.refresh(node)
+    res = await db.execute(
+        select(WorkflowNode)
+        .where(WorkflowNode.id == node.id)
+        .options(selectinload(WorkflowNode.config))
+    )
+    node = res.scalars().first()
+    assert node is not None, "This should never happen"
     return node
 
 
