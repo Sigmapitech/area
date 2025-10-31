@@ -54,6 +54,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^5.0.3
         version: 5.0.3(vite@7.1.12(@types/node@24.5.2)(sass-embedded@1.93.2)(sass@1.93.2))
+      run:
+        specifier: 1.5.0
+        version: 1.5.0
       sass-embedded:
         specifier: ^1.92.0
         version: 1.93.2
@@ -1090,6 +1093,11 @@ packages:
   rollup@4.52.2:
     resolution: {integrity: sha512-I25/2QgoROE1vYV+NQ1En9T9UFB9Cmfm2CJ83zZOlaDpvz29wGQSZXWKw7MiNXau7wYgB/T9fVIdIuEQ+KbiiA==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
+    hasBin: true
+
+  run@1.5.0:
+    resolution: {integrity: sha512-CBPzeX6JQZUdhZpSFyNt2vUk44ivKMWZYCNBYoZYEE46mL9nf6WyMP3320WnzIrJuo89+njiUvlo83jUEXjXLg==}
+    engines: {node: '>=v0.9.0'}
     hasBin: true
 
   rxjs@7.8.2:
@@ -2431,6 +2439,10 @@ snapshots:
       '@rollup/rollup-win32-x64-gnu': 4.52.2
       '@rollup/rollup-win32-x64-msvc': 4.52.2
       fsevents: 2.3.3
+
+  run@1.5.0:
+    dependencies:
+      minimatch: 10.0.3
 
   rxjs@7.8.2:
     dependencies:
