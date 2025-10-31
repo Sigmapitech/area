@@ -13,16 +13,7 @@ from . import (
 
 routers = []
 
-for mod in (
-    auth,
-    hello,
-    workflow,
-    spotify,
-    discord,
-    gmail,
-    caldav,
-    youtube
-):
+for mod in (auth, hello, workflow, spotify, discord, gmail, caldav, youtube):
     assert hasattr(
         mod, "router"
     ), f"Module {mod.__name__} is missing 'router' attribute"

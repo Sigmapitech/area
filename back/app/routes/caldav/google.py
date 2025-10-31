@@ -49,7 +49,8 @@ provider = OAuthProvider(package=__package__, config_model=Config)
 async def _get_token(user_id: int, db: AsyncSession) -> UserToken:
     token = await db.scalar(
         select(UserToken).where(
-            UserToken.user_id == user_id, UserToken.service == provider.cfg.service
+            UserToken.user_id == user_id,
+            UserToken.service == provider.cfg.service,
         )
     )
     if not token:
@@ -107,7 +108,11 @@ async def caldav_me(
         refreshed = await provider.refresh(user, db)
         email = await _get_user_email(refreshed["access_token"])
         if not email:
-            return {"ok": False, "status": 400, "error": "failed to resolve user email"}
+            return {
+                "ok": False,
+                "status": 400,
+                "error": "failed to resolve user email",
+            }
     url = f"{provider.cfg.resource_base}/{email}/user"
     body = (
         """
@@ -126,12 +131,16 @@ async def caldav_me(
         "Content-Type": "application/xml; charset=utf-8",
     }
     async with httpx.AsyncClient() as client:
-        resp = await client.request("PROPFIND", url, headers=headers, content=body)
+        resp = await client.request(
+            "PROPFIND", url, headers=headers, content=body
+        )
         # Try one refresh if unauthorized
         if resp.status_code == 401:
             refreshed = await provider.refresh(user, db)
             headers["Authorization"] = f"Bearer {refreshed['access_token']}"
-            resp = await client.request("PROPFIND", url, headers=headers, content=body)
+            resp = await client.request(
+                "PROPFIND", url, headers=headers, content=body
+            )
 
     ns = {"d": "DAV:", "cd": "urn:ietf:params:xml:ns:caldav"}
     try:
@@ -141,8 +150,14 @@ async def caldav_me(
         return {
             "ok": resp.status_code < 300,
             "status": resp.status_code,
-            "principal_href": principal_href_el.text if principal_href_el is not None else None,
-            "calendar_home_set": homeset_href_el.text if homeset_href_el is not None else None,
+            "principal_href": (
+                principal_href_el.text
+                if principal_href_el is not None
+                else None
+            ),
+            "calendar_home_set": (
+                homeset_href_el.text if homeset_href_el is not None else None
+            ),
         }
     except ET.ParseError:
         # Return raw if not XML (or on error)
@@ -159,7 +174,11 @@ async def caldav_principal(
         refreshed = await provider.refresh(user, db)
         email = await _get_user_email(refreshed["access_token"])
         if not email:
-            return {"ok": False, "status": 400, "error": "failed to resolve user email"}
+            return {
+                "ok": False,
+                "status": 400,
+                "error": "failed to resolve user email",
+            }
     url = f"{provider.cfg.resource_base}/{email}/user"
     body = (
         """
@@ -178,8 +197,14 @@ async def caldav_principal(
         "Content-Type": "application/xml; charset=utf-8",
     }
     async with httpx.AsyncClient() as client:
-        resp = await client.request("PROPFIND", url, headers=headers, content=body)
-    return Response(content=resp.text, media_type="application/xml", status_code=resp.status_code)
+        resp = await client.request(
+            "PROPFIND", url, headers=headers, content=body
+        )
+    return Response(
+        content=resp.text,
+        media_type="application/xml",
+        status_code=resp.status_code,
+    )
 
 
 def _find_text(elem: ET.Element, path: str, ns: dict) -> Optional[str]:
@@ -197,7 +222,11 @@ async def caldav_calendars(
         refreshed = await provider.refresh(user, db)
         email = await _get_user_email(refreshed["access_token"])
         if not email:
-            return {"ok": False, "status": 400, "error": "failed to resolve user email"}
+            return {
+                "ok": False,
+                "status": 400,
+                "error": "failed to resolve user email",
+            }
     # First resolve home-set for the authenticated user
     url = f"{provider.cfg.resource_base}/{email}/user"
     propfind = (
@@ -216,9 +245,15 @@ async def caldav_calendars(
         "Content-Type": "application/xml; charset=utf-8",
     }
     async with httpx.AsyncClient() as client:
-        r1 = await client.request("PROPFIND", url, headers=headers, content=propfind)
+        r1 = await client.request(
+            "PROPFIND", url, headers=headers, content=propfind
+        )
         if r1.status_code >= 300:
-            return Response(content=r1.text, media_type="application/xml", status_code=r1.status_code)
+            return Response(
+                content=r1.text,
+                media_type="application/xml",
+                status_code=r1.status_code,
+            )
         ns = {"d": "DAV:", "cd": "urn:ietf:params:xml:ns:caldav"}
         root = ET.fromstring(r1.text)
         homeset_href = root.find(".//cd:calendar-home-set/d:href", ns)
@@ -238,9 +273,15 @@ async def caldav_calendars(
 </propfind>
             """
         ).strip()
-        r2 = await client.request("PROPFIND", home_url, headers=headers, content=propfind2)
+        r2 = await client.request(
+            "PROPFIND", home_url, headers=headers, content=propfind2
+        )
     if r2.status_code >= 300:
-        return Response(content=r2.text, media_type="application/xml", status_code=r2.status_code)
+        return Response(
+            content=r2.text,
+            media_type="application/xml",
+            status_code=r2.status_code,
+        )
     # Return raw XML for now; clients can extract calendar collection hrefs
     return Response(content=r2.text, media_type="application/xml")
 
@@ -248,19 +289,26 @@ async def caldav_calendars(
 @router.get("/events")
 async def caldav_events(
     href: str = Query(..., description="Calendar collection URL to query"),
-    start: Optional[str] = Query(None, description="UTC start, e.g., 2025-10-29T00:00:00Z"),
-    end: Optional[str] = Query(None, description="UTC end, e.g., 2025-11-05T00:00:00Z"),
+    start: Optional[str] = Query(
+        None, description="UTC start, e.g., 2025-10-29T00:00:00Z"
+    ),
+    end: Optional[str] = Query(
+        None, description="UTC end, e.g., 2025-11-05T00:00:00Z"
+    ),
     user=Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ):
     token = await _get_token(user.id, db)
+
     # Convert times to CalDAV format YYYYMMDDTHHMMSSZ if provided
     def to_caldav(ts: Optional[str]) -> Optional[str]:
         if not ts:
             return None
         try:
             # parse RFC3339-ish
-            dtv = dt.datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(dt.timezone.utc)
+            dtv = dt.datetime.fromisoformat(
+                ts.replace("Z", "+00:00")
+            ).astimezone(dt.timezone.utc)
             return dtv.strftime("%Y%m%dT%H%M%SZ")
         except Exception:
             return None
@@ -272,9 +320,9 @@ async def caldav_events(
     if start_c or end_c:
         attrs = []
         if start_c:
-            attrs.append(f"start=\"{start_c}\"")
+            attrs.append(f'start="{start_c}"')
         if end_c:
-            attrs.append(f"end=\"{end_c}\"")
+            attrs.append(f'end="{end_c}"')
         time_filter = f"<time-range {' '.join(attrs)}/>"
 
     report = f"""
@@ -300,5 +348,11 @@ async def caldav_events(
         "Content-Type": "application/xml; charset=utf-8",
     }
     async with httpx.AsyncClient() as client:
-        resp = await client.request("REPORT", href, headers=headers, content=report)
-    return Response(content=resp.text, media_type="application/xml", status_code=resp.status_code)
+        resp = await client.request(
+            "REPORT", href, headers=headers, content=report
+        )
+    return Response(
+        content=resp.text,
+        media_type="application/xml",
+        status_code=resp.status_code,
+    )

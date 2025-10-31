@@ -82,7 +82,8 @@ async def get_node_by_id(
     db: AsyncSession, node_id: int
 ) -> WorkflowNode | None:
     result = await db.execute(
-        select(WorkflowNode).where(WorkflowNode.id == node_id)
+        select(WorkflowNode)
+        .where(WorkflowNode.id == node_id)
         .options(selectinload(WorkflowNode.config))
     )
     return result.scalars().first()
@@ -107,7 +108,9 @@ async def create_workflow_node(
         workflow_id=workflow_id,
     )
     if config:
-        node.config = [WorkflowNodeConfig(key=k, value=v) for k, v in config.items()]
+        node.config = [
+            WorkflowNodeConfig(key=k, value=v) for k, v in config.items()
+        ]
     db.add(node)
     await db.commit()
     await db.refresh(node)
