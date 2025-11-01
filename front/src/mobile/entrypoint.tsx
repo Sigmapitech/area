@@ -7,7 +7,7 @@ import TestSpotifyPage from "@/routes/test-spotify";
 import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
 import { CheckAPIConnection } from "./api-guard";
-import Burger, { useOnClickOutside } from "./composant/burger-menu";
+import MainLayout from "@/layouts/main";
 
 function MobileApp() {
   const [open, setOpen] = useState(false);
@@ -21,11 +21,11 @@ function MobileApp() {
           <Route path="/" element={<CheckAPIConnection />} />
           <Route path="/login" element={<LoginPage />} />
           <Route element={<LoginRequired />}>
-            <Burger open={open} setOpen={setOpen}>
+            <Route element={<MainLayout />}>
               <Route path="/home" element={<HomePage />} />
               <Route path="/graph" element={<WorkflowList />} />
               <Route path="/test-spotify" element={<TestSpotifyPage />} />
-            </Burger>
+            </Route>
             <Route path="/graph/:id" element={<GraphPage />} />
           </Route>
         </Routes>
