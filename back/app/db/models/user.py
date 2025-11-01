@@ -10,11 +10,14 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    auth = Column(String, nullable=False)
-    name = Column(String, nullable=False)
+    name = Column(String(64), nullable=False)
+
+    email = Column(String(256), unique=True, index=True, nullable=False)
+    auth = Column(String(256), nullable=False)
+
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
     workflows = relationship(
         "Workflow",
         back_populates="owner",
@@ -23,7 +26,7 @@ class User(Base):
     )
 
     tokens = relationship(
-        "UserToken",
+        "OAuthToken",
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True,
