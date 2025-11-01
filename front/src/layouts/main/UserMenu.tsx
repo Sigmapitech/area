@@ -1,11 +1,11 @@
 import "./style.scss";
 
 import {
-  useCallback,
-  useEffect,
   type Dispatch,
   type RefObject,
   type SetStateAction,
+  useCallback,
+  useEffect,
 } from "react";
 
 import { Link } from "react-router";

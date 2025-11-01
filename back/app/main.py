@@ -23,11 +23,14 @@ for route in routers:
 if "dev" in sys.argv:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=("http://localhost" "http://127.0.0.1:*"), # No comma in the tuple and it's normal
+        allow_origins=(
+            "http://localhost" "http://127.0.0.1:*"
+        ),  # No comma in the tuple and it's normal
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
 
 def main():
     uvicorn.run(app, host="127.0.0.1", port=8080)

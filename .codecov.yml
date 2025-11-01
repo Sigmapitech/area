@@ -10,6 +10,6 @@ coverage:
         target: 70
         paths:
           - "back/app"
-          - "!back/app/routes/providers"
+          - "!back/app/routes"
     patch:
       default: false
