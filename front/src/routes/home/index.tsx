@@ -61,7 +61,7 @@ export default function HomePage() {
       <div className="home-page">
         <div className="buttons">
           <Link to="/workflow">Graph page</Link>
-          <Link to="/test-spotify">Spotify test</Link>
+          <Link to="/services">Services</Link>
           <button type="button" onClick={logout}>
             Logout
           </button>

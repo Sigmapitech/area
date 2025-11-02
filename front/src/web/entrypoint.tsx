@@ -6,7 +6,6 @@ import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
 import ProfilePage from "@/routes/profile";
 import RegisterPage from "@/routes/register";
-import TestSpotifyPage from "@/routes/test-spotify";
 import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
 
@@ -22,7 +21,6 @@ function WebApp() {
               <Route path="/" element={<HomePage />} />
               <Route path="/workflow" element={<WorkflowList />} />
               <Route path="/workflow/:workflowId" element={<GraphPage />} />
-              <Route path="/test-spotify" element={<TestSpotifyPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/services" element={<ConnectServicesPage />} />
             </Route>
