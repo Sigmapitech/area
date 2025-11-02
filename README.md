@@ -44,11 +44,6 @@ The system is composed of three main parts:
 
 ### Installation
 
-- **Step 1**: Connect your phone with your laptop via a cable
-- **Step 2**: docker build -t test -f android/Dockerfile . && docker run test:latest
-- **Step 3**: Go to your browser -> connect to http://localhost:8081/ to be at the web interface
-- **Step 4**: Connect to http://localhost:8081/client.apk to download the mobile app
-
 #### Mobile installation
 
 - **Step 1**: Go to front/android and create a \`gradle.properties\` file. Fill it with those informations:
@@ -108,12 +103,11 @@ WIP
 
 ## 🛠 Contributing
 
-### Languages, frameworks and technologies
+### Languages and frameworks
 
 - Web App: React + SCSS
 - Mobile App: React + Capacitor + SCSS
 - Server: Python + fastapi
-- Environment: Nix + Docker
 
 ### How to add a service
 
@@ -139,10 +133,3 @@ WIP
 ## 📖 Documentation
 
 - **API**: http://localhost:8080/docs
-
-keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;
-
-RELEASE_STORE_FILE=/build/apk_key.jks
-RELEASE_STORE_PASSWORD=xxxx
-RELEASE_KEY_ALIAS=alias
-RELEASE_KEY_PASSWORD=xxxx
