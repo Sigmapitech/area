@@ -73,8 +73,8 @@ async def _get_user_email(access_token: str) -> Optional[str]:
 
 
 @router.get("/connect")
-async def caldav_connect(token: str = Query(...)):
-    return await provider.connect(token)
+async def google_connect(token: str = Query(...), platform: str = Query(...)):
+    return await provider.connect(token, platform)
 
 
 @router.get("/auth")

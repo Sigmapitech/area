@@ -49,8 +49,8 @@ provider = OAuthProvider(package=__package__, config_model=Config)
 
 
 @router.get("/connect")
-async def gmail_connect(token: str = Query(...)):
-    return await provider.connect(token)
+async def gmail_connect(token: str = Query(...), platform: str = Query(...)):
+    return await provider.connect(token, platform)
 
 
 @router.get("/auth")

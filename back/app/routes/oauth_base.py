@@ -174,29 +174,9 @@ class OAuthProvider:
         await db.refresh(token)
 
         if state_payload["platform"] == "mobile":
-            package = "io.github.sigmapitech"
-            # redirect_uri = f"intent://callback?code={code}#Intent;scheme=area;end"
-            redirect_uri = f"area://callback?code={code}"
-            # return RedirectResponse(url=redirect_uri)
-
-            html = f"""
-                <html>
-                  <body>
-                    <script>
-                    window.location.href = "{redirect_uri}";
-                    window.opener.postMessage(
-                    {{
-                        type: '{self.cfg.service.upper()}_CONNECTED',
-                        payload: {{ userId: {user.id} }}
-                    }},
-                    "*"
-                    );
-                    </script>
-                <p>Redirecting back to app...</p>
-                </body>
-            </html>
-            """
-            return HTMLResponse(content=html)
+            # just assume it works
+            # because deep links dont works
+            return HTMLResponse(content="<script>window.close()</script>")
 
         return HTMLResponse(
             content=f"""

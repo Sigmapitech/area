@@ -45,22 +45,10 @@ export default function TestSpotifyPage() {
         }
       });
 
-      console.log("opening browser");
       Browser.open({
         url: `${API_BASE_URL}/spotify/connect?token=${token}&platform=${__APP_PLATFORM__}`,
-      })
-        .then(() => {
-          console.log("end");
-        })
-        .catch((e) => {
-          console.log("nope", e);
-        });
-      const [width, height, left, top] = getPopupDimension();
-      const popup = window.open(
-        `${API_BASE_URL}/spotify/connect?token=${token}&platform=${__APP_PLATFORM__}`,
-        "DiscordConnect",
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
+      });
+      // just assume it works
     } else {
       const [width, height, left, top] = getPopupDimension();
       const popup = window.open(
