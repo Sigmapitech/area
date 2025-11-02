@@ -10,6 +10,7 @@ from ..schemas.user import (
     AuthResponse,
     LoginRequest,
     RegisterRequest,
+    UserBase,
     UserSchema,
 )
 from ..security.deps import get_current_user
@@ -74,10 +75,10 @@ async def get_me(
 
 @router.patch(
     "/credentials",
-    response_model=UserSchema,
+    response_model=UserBase,
     description="Update current user",
     responses={
-        200: {"model": UserSchema, "description": "Current user data"},
+        200: {"model": UserBase, "description": "Current user data"},
         401: {"description": "Unauthorized"},
     },
 )
