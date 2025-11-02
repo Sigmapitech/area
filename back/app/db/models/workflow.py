@@ -8,8 +8,9 @@ class Workflow(Base):
     __tablename__ = "workflow"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String, index=True, nullable=True)
+    name = Column(String(32), index=True)
+
+    description = Column(String(512), index=True, nullable=True)
     owner_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"))
 
     nodes = relationship(
@@ -29,6 +30,8 @@ class WorkflowNode(Base):
     workflow_id = Column(
         Integer, ForeignKey("workflow.id", ondelete="CASCADE")
     )
+
+    interaction_id = Column(Integer, ForeignKey("interaction.id"))
 
     config = relationship(
         "WorkflowNodeConfig",
@@ -66,37 +69,15 @@ class WorkflowNodeConfig(Base):
     node_id = Column(
         Integer, ForeignKey("workflow_node.id", ondelete="CASCADE")
     )
-    key = Column(String, index=True)
-    value = Column(String, index=True)
+
+    key = Column(String(32), index=True)
+    value = Column(String(128), index=True)
 
     node = relationship("WorkflowNode", back_populates="config")
 
 
 class WorkflowEdge(Base):
-    """
-    Represents a directed connection between two WorkflowNode entities in the workflow graph.
-
-    This SQLAlchemy ORM model stores edges that originate from one node and point to another.
-    A uniqueness constraint on `to_node_id` guarantees that a node can have at most one
-    incoming edge, while a single node may emit multiple outgoing edges. Deleting a node
-    cascades to its associated edges.
-
-    Attributes:
-        id (int): Primary key identifier of the edge.
-        from_node_id (int): Foreign key to the source WorkflowNode (workflow_node.id), cascades on delete.
-        to_node_id (int): Foreign key to the target WorkflowNode (workflow_node.id), cascades on delete.
-                          Uniquely constrained to enforce at most one incoming edge per node.
-
-    Relationships:
-        from_node (WorkflowNode): Source node; back-populates 'outgoing_edges'.
-        to_node (WorkflowNode): Target node; back-populates 'incoming_edge'.
-
-    Constraints and behavior:
-        - Directed edge: from_node -> to_node.
-        - ondelete="CASCADE" ensures edges are removed when their associated nodes are deleted.
-        - Unique to_node_id enforces in-degree <= 1, enabling a one-to-many (source->edges) and
-          one-to-one (target<-edge) structure.
-    """
+    """Represents a directed connection between two WorkflowNode its graph."""
 
     __tablename__ = "workflow_edge"
 
