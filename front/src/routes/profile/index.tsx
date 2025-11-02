@@ -10,6 +10,7 @@ export default function ProfilePage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [originalEmail, setOriginalEmail] = useState(""); // track original
   const [password, setPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
 
@@ -26,6 +27,7 @@ export default function ProfilePage() {
       .then((data) => {
         setName(data.name || "");
         setEmail(data.email || "");
+        setOriginalEmail(data.email || "");
       })
       .catch((err) => {
         alert((err as Error)?.message || "An unknown error occurred");
@@ -40,13 +42,28 @@ export default function ProfilePage() {
     }
 
     const payload: Record<string, string> = {};
-    if (email !== "") payload.email = email;
+
     if (name !== "") payload.name = name;
-    if (password != "" && currentPassword != "") {
+
+    if (email !== originalEmail) {
+      if (!currentPassword) {
+        alert("Changing your email requires entering your current password.");
+        return;
+      }
+      payload.email = email;
+      payload.current_password = currentPassword;
+    }
+
+    if (password && currentPassword) {
       payload.password = password;
       payload.current_password = currentPassword;
-    } else if (password || currentPassword) {
-      alert("To change password, both fields are required.");
+    } else if (password && !currentPassword) {
+      alert("To change your password, enter your current password.");
+      return;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      alert("Nothing to update.");
       return;
     }
 
@@ -66,6 +83,7 @@ export default function ProfilePage() {
         alert("Profile updated successfully!");
         setName(data.name || name);
         setEmail(data.email || email);
+        setOriginalEmail(data.email || email);
         setPassword("");
         setCurrentPassword("");
       })
