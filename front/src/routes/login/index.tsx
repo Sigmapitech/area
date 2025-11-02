@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -6,39 +6,67 @@ import "./auth.scss";
 
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
+import FormField from "@/components/form/field";
+import FormSubmitButton, {
+  handleFormSubmit,
+} from "@/components/form/submit-button";
 
 export default function LoginPage() {
   const { login } = useAuth();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const REGISTRATION_FIELDS = [
+    {
+      label: "Email",
+      name: "email",
+      type: "email",
+      placeholder: "Email",
+      pattern: ".+@.+",
+      title: "Please enter a valid email address",
+    },
+    {
+      label: "Password",
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      pattern: ".{6,}",
+      title: "Minimum 6 characters",
+    },
+  ];
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setError("");
 
-    fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Invalid credentials");
-        }
-        return response.json();
-      })
-      .then((data) => {
+    if (!e.currentTarget.checkValidity()) return;
+    e.preventDefault();
+
+    const { email, password } = formData;
+
+    handleFormSubmit({
+      url: `${API_BASE_URL}/auth/login/`,
+      body: { email, password },
+      onSuccess: (data) => {
         login(data.token);
         navigate("/");
-      })
-      .catch((err) => {
-        setError((err as Error)?.message || "An unknown error occurred");
-      });
+      },
+      onError: (e) => {
+        setError(e);
+      },
+    });
   };
 
   return (
@@ -48,31 +76,19 @@ export default function LoginPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="auth-box">
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+        {REGISTRATION_FIELDS.map((field) => (
+          <FormField
+            key={field.name}
+            value={formData[field.name as keyof typeof formData]}
+            onChange={handleChange}
+            {...field}
           />
-        </div>
-        <div className="auth-box">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        ))}
 
         {error && <p className="error">{error}</p>}
 
         <div className="actions">
-          <input className="btn btn-validate" type="submit" value="Sign in" />
+          <FormSubmitButton value="Sign in" />
         </div>
         <div className="info">
           <p>Don't have an account?</p>
