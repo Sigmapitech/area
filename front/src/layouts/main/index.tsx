@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Outlet } from "react-router";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
-import UserMenu from "./UserMenu";
 import Burger, { useOnClickOutside } from "@/mobile/composant/burger-menu";
+import UserMenu from "./UserMenu";
 
 export default function MainLayout() {
   const { token } = useAuth();

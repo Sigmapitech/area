@@ -1,12 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AuthProvider, LoginRequired } from "@/auth";
+import MainLayout from "@/layouts/main";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
 import TestSpotifyPage from "@/routes/test-spotify";
 import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
 import { CheckAPIConnection } from "./api-guard";
-import MainLayout from "@/layouts/main";
 
 function MobileApp() {
   return (
