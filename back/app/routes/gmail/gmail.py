@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_session
-from ...db.models.oauth import UserToken
+from ...db.models.oauth import OAuthToken
 from ...security.deps import get_current_user
 from ..oauth_base import OAuthProvider
 
@@ -91,10 +91,10 @@ def _b64url_decode(data: str) -> bytes:
 
 async def _get_gmail_token(
     user_id: int, db: AsyncSession
-) -> Optional[UserToken]:
+) -> Optional[OAuthToken]:
     return await db.scalar(
-        select(UserToken).where(
-            UserToken.user_id == user_id, UserToken.service == "gmail"
+        select(OAuthToken).where(
+            OAuthToken.owner_id == user_id, OAuthToken.service == "gmail"
         )
     )
 
