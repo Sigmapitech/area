@@ -94,4 +94,4 @@ WIP
 
 ## 📖 Documentation
 
-WIP
+- **API**: http://localhost:8080/docs
