@@ -1,4 +1,4 @@
-import { StrictMode, useState } from "react";
+import { StrictMode } from "react";
 
 import "./style.scss";
 import { Link } from "react-router";

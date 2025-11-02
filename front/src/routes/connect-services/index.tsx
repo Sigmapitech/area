@@ -1,6 +1,6 @@
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
@@ -98,6 +98,7 @@ export default function ConnectServicesPage() {
       <h1>Services</h1>
       <div>
         <button
+          type="button"
           className="service-page-refresh"
           onClick={handleRefresh}
           disabled={refreshing}
@@ -113,6 +114,7 @@ export default function ConnectServicesPage() {
             <div className="service-card" key={name}>
               <div
                 className="service-card-icon"
+                // biome-ignore lint: this are known svgs
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
               <div className="service-card-description">
