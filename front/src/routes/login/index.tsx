@@ -91,10 +91,7 @@ export default function LoginPage() {
           <FormSubmitButton value="Sign in" />
         </div>
         <div className="info">
-          <p>Don't have an account?</p>
-          <Link className="btn btn-register" to="/register">
-            Register
-          </Link>
+          <Link to="/register">don't have an account?</Link>
         </div>
       </form>
     </div>
