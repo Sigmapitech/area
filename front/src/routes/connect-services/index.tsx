@@ -99,7 +99,7 @@ export default function ConnectServicesPage() {
       <div>
         <button
           type="button"
-          className="service-page-refresh"
+          className="btn service-page-refresh"
           onClick={handleRefresh}
           disabled={refreshing}
         >
@@ -121,7 +121,11 @@ export default function ConnectServicesPage() {
                 <p className="service-card-name">{name}</p>
               </div>
               {!isConnected && (
-                <button type="button" onClick={() => handleConnect(name)}>
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => handleConnect(name)}
+                >
                   Connect
                 </button>
               )}

@@ -125,9 +125,11 @@ export default function ProfilePage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button type="submit">Update Profile</button>
+          <button className="btn" type="submit">
+            Update Profile
+          </button>
         </form>
-        <button type="button" onClick={logout}>
+        <button className="btn" type="button" onClick={logout}>
           Logout
         </button>
       </div>

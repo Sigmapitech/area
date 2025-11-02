@@ -210,7 +210,11 @@ export default function GraphPage() {
           <Controls />
         </ReactFlow>
       </ReactFlowProvider>
-      <button type="button" className="add-node-btn" onClick={handleAddNode}>
+      <button
+        type="button"
+        className="btn add-node-btn"
+        onClick={handleAddNode}
+      >
         Add Node
       </button>
     </main>

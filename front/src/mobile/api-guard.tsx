@@ -52,10 +52,10 @@ export function CheckAPIConnection() {
       </div>
       <br />
       <div style={{ display: "flex", gap: "1em" }}>
-        <button type="button" onClick={checkAPI}>
+        <button className="btn" type="button" onClick={checkAPI}>
           Retry
         </button>
-        <button type="button" onClick={skip}>
+        <button className="btn" type="button" onClick={skip}>
           Skip anyway
         </button>
       </div>

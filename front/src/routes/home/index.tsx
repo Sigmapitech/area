@@ -12,8 +12,12 @@ export default function HomePage() {
     <StrictMode>
       <div className="home-page">
         <div className="buttons">
-          <Link to="/workflow">Workflows</Link>
-          <Link to="/services">Services</Link>
+          <Link className="btn" to="/workflow">
+            Workflows
+          </Link>
+          <Link className="btn" to="/services">
+            Services
+          </Link>
         </div>
       </div>
     </StrictMode>

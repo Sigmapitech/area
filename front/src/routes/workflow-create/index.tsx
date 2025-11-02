@@ -98,7 +98,9 @@ export default function WorkflowList() {
               setNewWorkflow((f) => ({ ...f, description: e.target.value }))
             }
           />
-          <button type="submit">＋ Create Workflow</button>
+          <button className="btn" type="submit">
+            ＋ Create Workflow
+          </button>
         </form>
 
         <ul className="workflow-items">
@@ -109,12 +111,12 @@ export default function WorkflowList() {
                 <p>{workflow.description || "No description"}</p>
               </div>
               <div className="workflow-card__actions">
-                <Link to={`/workflow/${workflow.id}`} className="view-btn">
+                <Link to={`/workflow/${workflow.id}`} className="btn view-btn">
                   View
                 </Link>
                 <button
                   type="button"
-                  className="delete-btn"
+                  className="btn delete-btn"
                   onClick={() => deleteWorkflow(workflow.id)}
                 >
                   Delete
