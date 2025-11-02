@@ -1,18 +1,3 @@
-.btn {
-  display: flex;
-  color: black;
-  background: #96bfff;
-  border: 2px solid transparent;
-  padding: .5rem;
-  color: black;
-
-  &:hover, &:focus-visible {
-    color: black;
-    background: #E4BEF8;
-    outline: none;
-  }
-
-  &-validate {
-    width: 100%;
-  }
+.btn-validate {
+  width: 100%;
 }
