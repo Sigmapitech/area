@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -6,61 +6,104 @@ import "./auth.scss";
 
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
+import FormField from "@/components/form/field";
+import FormSubmitButton, {
+  handleFormSubmit,
+} from "@/components/form/submit-button";
 
 export default function RegisterPage() {
   const { login } = useAuth();
-
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordValid, setPasswordValid] = useState(true);
-  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  function isPasswordValid(pw: string): boolean {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-      pw
-    );
-  }
+  const [formData, setFormData] = useState({
+    email: "",
+    name: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const REGISTRATION_FIELDS = [
+    {
+      label: "Email",
+      name: "email",
+      type: "email",
+      placeholder: "Email",
+      pattern: ".+@.+",
+      title: "Please enter a valid email address",
+    },
+    {
+      label: "Name",
+      name: "name",
+      type: "text",
+      placeholder: "Name",
+      pattern: ".*",
+      title: "Please enter your name",
+    },
+    {
+      label: "Password",
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      pattern:
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+      title:
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+    },
+    {
+      label: "Confirm Password",
+      name: "confirmPassword",
+      type: "password",
+      placeholder: "Confirm Password",
+      pattern:
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+      title:
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+    },
+  ];
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+
+      if (name === "password" || name === "confirmPassword") {
+        if (next.password !== next.confirmPassword)
+          setError("Passwords do not match");
+        else setError("");
+      }
+
+      return next;
+    });
+
+    console.log(name);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setError("");
+
+    if (!e.currentTarget.checkValidity()) return;
+    e.preventDefault();
+
+    const { email, name, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    if (!isPasswordValid(password)) {
-      setError(
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-      );
-      return;
-    }
-
-    fetch(`${API_BASE_URL}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, name, password }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Registration failed");
-        }
-        return response.json();
-      })
-      .then((data) => {
+    handleFormSubmit({
+      url: `${API_BASE_URL}/auth/register/`,
+      body: { email, name, password },
+      onSuccess: (data) => {
         login(data.token);
         navigate("/");
-      })
-      .catch((err) => {
-        setError((err as Error)?.message || "An unknown error occurred");
-      });
+      },
+      onError: (e) => {
+        setError(e);
+      },
+    });
   };
 
   return (
@@ -70,84 +113,19 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="auth-box">
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+        {REGISTRATION_FIELDS.map((field) => (
+          <FormField
+            key={field.name}
+            value={formData[field.name as keyof typeof formData]}
+            onChange={handleChange}
+            {...field}
           />
-        </div>
-        <div className="auth-box">
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        {!passwordValid && <p className="error">{passwordError}</p>}
-
-        <div className="auth-box">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (!isPasswordValid(e.target.value)) {
-                setPasswordValid(false);
-                setPasswordError(
-                  "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-                );
-                return;
-              }
-              if (e.target.value !== confirmPassword) {
-                setPasswordValid(false);
-                setPasswordError("Passwords do not match");
-                return;
-              }
-              setPasswordValid(true);
-            }}
-            required
-          />
-        </div>
-        <div className="auth-box">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              if (e.target.value !== password) {
-                setPasswordValid(false);
-                setPasswordError("Passwords do not match");
-                return;
-              }
-              if (!isPasswordValid(e.target.value)) {
-                setPasswordValid(false);
-                setPasswordError(
-                  "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-                );
-                return;
-              }
-              setPasswordValid(true);
-            }}
-            required
-          />
-        </div>
+        ))}
 
         {error && <p className="error">{error}</p>}
 
         <div className="actions">
-          <input className="btn btn-validate" type="submit" value="Sign up" />
+          <FormSubmitButton value="Sign up" />
         </div>
         <div className="info">
           <p>Already have an account?</p>
