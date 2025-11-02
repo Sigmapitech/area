@@ -119,7 +119,9 @@ export default function ConnectServicesPage() {
                 <p className="service-card-name">{name}</p>
               </div>
               {!isConnected && (
-                <button onClick={() => handleConnect(name)}>Connect</button>
+                <button type="button" onClick={() => handleConnect(name)}>
+                  Connect
+                </button>
               )}
               {isConnected && <span className="connected-tag">Connected</span>}
             </div>
