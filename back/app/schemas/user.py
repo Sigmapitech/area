@@ -17,7 +17,7 @@ PasswordStr = Annotated[
 ]
 
 
-class UserSchema(BaseModel):
+class UserBase(BaseModel):
     id: int
     email: str
     name: str
@@ -25,6 +25,10 @@ class UserSchema(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserSchema(UserBase):
+    services: dict[str, bool]
 
 
 class AuthResponse(BaseModel):

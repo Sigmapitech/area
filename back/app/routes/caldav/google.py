@@ -1,5 +1,6 @@
 import datetime as dt
 import logging
+import pathlib
 import xml.etree.ElementTree as ET
 from typing import Optional
 
@@ -43,7 +44,11 @@ class Config(BaseModel):
 
 router = APIRouter(prefix="/caldav", tags=["caldav"])
 
-provider = OAuthProvider(package=__package__, config_model=Config)
+provider = OAuthProvider(
+    package=__package__,
+    config_model=Config,
+    icon=(pathlib.Path(__file__).parent / "icon.svg").read_text()
+)
 
 
 async def _get_token(user_id: int, db: AsyncSession) -> UserToken:
@@ -73,8 +78,8 @@ async def _get_user_email(access_token: str) -> Optional[str]:
 
 
 @router.get("/connect")
-async def caldav_connect(token: str = Query(...)):
-    return await provider.connect(token)
+async def google_connect(token: str = Query(...), platform: str = Query(...)):
+    return await provider.connect(token, platform)
 
 
 @router.get("/auth")

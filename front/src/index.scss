@@ -17,13 +17,14 @@ body, #root {
   margin: 0;
   width: 100vw;
   height: 100vh;
+  overflow: scroll;
   display: flex;
   place-items: center;
 }
 
 a {
+  color: #7287fd;
   font-weight: 500;
-  color: #7f849c;
   text-decoration: inherit;
 
   &:hover {
@@ -32,7 +33,6 @@ a {
 }
 
 h1 {
-  font-size: 3.2em;
   line-height: 1.1;
 }
 

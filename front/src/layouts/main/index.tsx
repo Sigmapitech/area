@@ -1,24 +1,15 @@
 import AREA from "../../../favicon.svg";
 import "./style.scss";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link, Outlet } from "react-router";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
-import Burger, { useOnClickOutside } from "@/mobile/composant/burger-menu";
-import UserMenu from "./UserMenu";
 
 export default function MainLayout() {
   const { token } = useAuth();
   const [userInitial, setUserInitial] = useState("?");
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  const toggleMenu = () => {
-    setMenuVisible((prev) => !prev);
-  };
 
   useEffect(() => {
     if (!token) return;
@@ -35,32 +26,17 @@ export default function MainLayout() {
       });
   }, [token]);
 
-  const [openBurger, setOpenBurger] = useState(false);
-  const node = useRef<HTMLDivElement>(null);
-  useOnClickOutside(node, () => setOpenBurger(false));
-
   return (
     <div className="main">
-      <Burger open={openBurger} setOpen={setOpenBurger} />
-
       <header className="main-bar">
         <Link to="/" className="home-link">
           <img src={AREA} height="24px" width="24px" alt="Area" />
           <span>Area</span>
         </Link>
 
-        <div className="user-icon-wrapper" ref={menuRef}>
-          <button type="button" className="user-icon" onClick={toggleMenu}>
-            <span className="user-icon-initial">{userInitial}</span>
-          </button>
-        </div>
-        {
-          <UserMenu
-            menuRef={menuRef}
-            menuVisible={menuVisible}
-            setMenuVisible={setMenuVisible}
-          />
-        }
+        <Link type="button" className="user-icon" to="/profile">
+          <span className="user-icon-initial">{userInitial}</span>
+        </Link>
       </header>
 
       <Outlet />
