@@ -1,10 +1,8 @@
-import { StrictMode, useState } from "react";
-
-import { API_BASE_URL } from "@/api_url";
-import { useAuth } from "@/auth";
-
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
+import { StrictMode, useState } from "react";
+import { API_BASE_URL } from "@/api_url";
+import { useAuth } from "@/auth";
 
 function getPopupDimension() {
   const width = 500;
