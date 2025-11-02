@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_session
-from ...db.models.oauth import UserToken
+from ...db.models.oauth import OAuthToken
 from ...security.deps import get_current_user
 from ..oauth_base import OAuthProvider
 
@@ -51,11 +51,11 @@ provider = OAuthProvider(
 )
 
 
-async def _get_token(user_id: int, db: AsyncSession) -> UserToken:
+async def _get_token(user_id: int, db: AsyncSession) -> OAuthToken:
     token = await db.scalar(
-        select(UserToken).where(
-            UserToken.user_id == user_id,
-            UserToken.service == provider.cfg.service,
+        select(OAuthToken).where(
+            OAuthToken.owner_id == user_id,
+            OAuthToken.service == provider.cfg.service,
         )
     )
     if not token:

@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import get_package_config
 from ..db.crud import users
-from ..db.models.oauth import UserToken
+from ..db.models.oauth import OAuthToken
 from ..db.models.user import User
 from ..security.jwt import decode_access_token
 
@@ -171,7 +171,7 @@ class OAuthProvider:
 
         tokens = resp.json()
 
-        token = UserToken(
+        token = OAuthToken(
             user_id=user.id,
             service=self.cfg.service,
             access_token=tokens.get("access_token"),
@@ -207,9 +207,9 @@ class OAuthProvider:
 
     async def refresh(self, user: User, db: AsyncSession):
         token = await db.scalar(
-            select(UserToken).where(
-                UserToken.user_id == user.id,
-                UserToken.service == self.cfg.service,
+            select(OAuthToken).where(
+                OAuthToken.owner_id == user.id,
+                OAuthToken.service == self.cfg.service,
             )
         )
         if not token:
@@ -258,9 +258,9 @@ class OAuthProvider:
 
     async def me(self, user: User, db: AsyncSession):
         token = await db.scalar(
-            select(UserToken).where(
-                UserToken.user_id == user.id,
-                UserToken.service == self.cfg.service,
+            select(OAuthToken).where(
+                OAuthToken.owner_id == user.id,
+                OAuthToken.service == self.cfg.service,
             )
         )
         if not token:
