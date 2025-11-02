@@ -1,4 +1,5 @@
 import logging
+import pathlib
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -36,8 +37,11 @@ class Config(BaseModel):
 
 router = APIRouter(prefix="/youtube", tags=["youtube"])
 
-provider = OAuthProvider(package=__package__, config_model=Config)
-
+provider = OAuthProvider(
+    package=__package__,
+    config_model=Config,
+    icon=(pathlib.Path(__file__).parent / "icon.svg").read_text()
+)
 
 @router.get("/connect")
 async def youtube_connect(token: str = Query(...), platform: str = Query(...)):

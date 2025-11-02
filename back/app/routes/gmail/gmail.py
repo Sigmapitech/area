@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import pathlib
 from typing import Optional
 
 import httpx
@@ -45,7 +46,11 @@ class Config(BaseModel):
 
 router = APIRouter(prefix="/gmail", tags=["gmail"])
 
-provider = OAuthProvider(package=__package__, config_model=Config)
+provider = OAuthProvider(
+    package=__package__,
+    config_model=Config,
+    icon=(pathlib.Path(__file__).parent / "icon.svg").read_text()
+)
 
 
 @router.get("/connect")

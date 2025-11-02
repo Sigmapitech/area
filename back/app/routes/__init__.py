@@ -12,6 +12,7 @@ providers = (
     "gmail",
     "caldav",
     "youtube",
+    "oauth_base",
 )
 
 for mod_name in providers:

@@ -4,11 +4,12 @@ import secrets
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from typing import Any, Mapping
 from urllib.parse import urlencode
 
 import httpx
-from fastapi import HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -41,9 +42,19 @@ class OAuthConfig:
 class OAuthProvider:
     """Generic OAuth 2.0 Authorization Code provider helper."""
 
-    def __init__(self, package: str | None, config_model: Any):
-        # Load provider-specific config from config.toml based on package path
+    services = {}
+
+    def __init__(
+        self,
+        icon: str,
+        package: str | None,
+        config_model: Any
+    ):
         assert package is not None, "Package name must be provided"
+
+        *_, service_name = package.split(".")
+        self.services[service_name] = icon
+
         settings = get_package_config(package, config_model)
         # Normalize into OAuthConfig
         token_url = (
@@ -279,3 +290,10 @@ class OAuthProvider:
             )
 
         return resp.json()
+
+
+router = APIRouter(prefix="/services", tags=["services"])
+
+@router.get("", response_model=dict[str, str])
+async def get_service_list():
+    return OAuthProvider.services

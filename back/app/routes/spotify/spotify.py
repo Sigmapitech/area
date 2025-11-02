@@ -1,6 +1,7 @@
 import logging
+import pathlib
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,7 +26,11 @@ class Config(BaseModel):
 
 router = APIRouter(prefix="/spotify", tags=["spotify"])
 
-provider = OAuthProvider(package=__package__, config_model=Config)
+provider = OAuthProvider(
+    package=__package__,
+    config_model=Config,
+    icon=(pathlib.Path(__file__).parent / "icon.svg").read_text()
+)
 
 
 @router.get("/connect")

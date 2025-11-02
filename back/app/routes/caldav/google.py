@@ -1,5 +1,6 @@
 import datetime as dt
 import logging
+import pathlib
 import xml.etree.ElementTree as ET
 from typing import Optional
 
@@ -43,7 +44,11 @@ class Config(BaseModel):
 
 router = APIRouter(prefix="/caldav", tags=["caldav"])
 
-provider = OAuthProvider(package=__package__, config_model=Config)
+provider = OAuthProvider(
+    package=__package__,
+    config_model=Config,
+    icon=(pathlib.Path(__file__).parent / "icon.svg").read_text()
+)
 
 
 async def _get_token(user_id: int, db: AsyncSession) -> UserToken:
