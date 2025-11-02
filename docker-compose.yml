@@ -24,8 +24,8 @@ services:
 
   client_web:
     build:
-      context: .
-      dockerfile: front/Dockerfile
+      context: front
+      dockerfile: Dockerfile
     depends_on:
 
       server:

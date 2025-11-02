@@ -1,27 +1,19 @@
-# Nix builder
-FROM nixos/nix:latest AS builder
+FROM ubuntu:24.04
 
-# Copy our source and setup our working dir.
-COPY .. /tmp/build
-WORKDIR /tmp/build
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Build our Nix environment (front-web helper)
-RUN nix \
-    --extra-experimental-features "nix-command flakes" \
-    --option filter-syscalls false \
-    build .#front
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt install -y nodejs \
+    && corepack enable
 
-# Copy the Nix store closure into a directory.
-RUN mkdir /tmp/nix-store-closure
-RUN cp -R $(nix-store -qR result/) /tmp/nix-store-closure
+WORKDIR /app
 
-# Final image is based on scratch.
-FROM scratch
+COPY . .
+ENV CI=true
 
-# Copy /nix/store and the built result
-COPY --from=builder /tmp/nix-store-closure /nix/store
-COPY --from=builder /tmp/build/result /app
+RUN pnpm install --frozen-lockfile
+RUN pnpm build:web
 
-# Expose client_web port and run
 EXPOSE 8081
-CMD ["/app/bin/web"]
+CMD ["serve", "-s", "dist", "-l", "8081"]
