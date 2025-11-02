@@ -44,7 +44,10 @@ The system is composed of three main parts:
 
 ### Installation
 
-WIP
+- **Step 1**: Connect your phone with your laptop via a cable
+- **Step 2**: docker-compose build && docker-compose up
+- **Step 3**: Go to your browser -> connect to http://localhost:8081/ to be at the web interface
+- **Step 4**:Connect to http://localhost:8081/client.apk to download the mobile app
 
 ### Services
 
@@ -61,6 +64,21 @@ WIP
 ---
 
 ## 🛠 Contributing
+
+### Languages and framework
+
+- Web App: React + SCSS
+- Mobile App: React + Capacitor + SCSS
+- Server: Python + fastapi
+
+### How to add a service
+
+-> Go to area/back/app/routes
+-> Add a folder and name it after the service you want to add
+-> Create a `__init__.py` file following other examples
+-> Create the .py file for the service and complete it following the other examples
+
+### How to add an A-REA
 
 WIP
 
