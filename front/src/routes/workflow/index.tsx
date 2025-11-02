@@ -14,7 +14,6 @@ import { useNavigate, useParams } from "react-router";
 import "@xyflow/react/dist/style.css";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
-
 import "./style.scss";
 
 const nodeDefaults = {
@@ -25,9 +24,7 @@ const nodeDefaults = {
 export default function GraphPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
-
   const { workflowId } = useParams<{ workflowId: string }>();
-
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [loading, setLoading] = useState(true);
@@ -35,85 +32,90 @@ export default function GraphPage() {
   const onConnect = useCallback(
     async (params: Connection) => {
       setEdges((els) => addEdge(params, els));
-
       if (!workflowId || !token) return;
 
       try {
-        const targetNodeId = params.target;
-        const sourceNodeId = params.source;
-
         const res = await fetch(
-          `${API_BASE_URL}/workflow/${workflowId}/nodes/${targetNodeId}`,
+          `${API_BASE_URL}/workflow/${workflowId}/edges`,
           {
-            method: "PATCH",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ parent_id: sourceNodeId }),
+            body: JSON.stringify({
+              from_node_id: params.source,
+              to_node_id: params.target,
+            }),
           }
         );
 
         if (!res.ok) {
-          console.error("Failed to update node parent:", res.statusText);
+          console.error("Failed to create edge:", res.statusText);
           return;
         }
 
-        const updatedNode = await res.json();
-        setNodes((nds) =>
-          nds.map((n) =>
-            n.id === updatedNode.id.toString()
-              ? {
-                  ...n,
-                  data: {
-                    label: `Node ${updatedNode.id}`,
-                  },
-                }
-              : n
-          )
-        );
+        const savedEdge = await res.json();
+        setEdges((eds) => [
+          ...eds,
+          {
+            id: `e${savedEdge.from_node_id}-${savedEdge.to_node_id}`,
+            source: savedEdge.from_node_id.toString(),
+            target: savedEdge.to_node_id.toString(),
+            animated: true,
+          },
+        ]);
       } catch (err) {
-        console.error("Error updating node parent:", err);
+        console.error("Error creating edge:", err);
       }
     },
-    [setEdges, setNodes, workflowId, token]
+    [workflowId, token, setEdges]
   );
 
   useEffect(() => {
-    const fetchNodes = async () => {
+    const fetchWorkflow = async () => {
       if (!workflowId || !token) return;
       setLoading(true);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/workflow/${workflowId}`, {
+        const resNodes = await fetch(`${API_BASE_URL}/workflow/${workflowId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        const dataNodes = await resNodes.json();
 
-        const data = await res.json();
-        if (res.status === 404 && data.detail === "Workflow not found") {
+        if (
+          resNodes.status === 404 &&
+          dataNodes.detail === "Workflow not found"
+        ) {
           navigate("/workflow", { replace: true });
           return;
         }
 
-        // Map nodes
-        const fetchedNodes = data.nodes.map((node: any, index: number) => ({
+        const fetchedNodes = dataNodes.nodes.map((node, index: number) => ({
           id: node.id.toString(),
           data: { label: `Node ${node.id}` },
-          position: { x: (node.config?.parent_id ?? 0) * 200, y: index * 120 },
+          position: {
+            x: (node.config?.parent_id ?? 0) * 200,
+            y: index * 120,
+          },
           ...nodeDefaults,
         }));
-
-        // Create edges if node.config contains parent info
-        const fetchedEdges = data.nodes
-          .filter((n: any) => n.config?.parent_id)
-          .map((n: any) => ({
-            id: `e${n.config.parent_id}-${n.id}`,
-            source: n.config.parent_id.toString(),
-            target: n.id.toString(),
-            animated: true,
-          }));
-
         setNodes(fetchedNodes);
+
+        const resEdges = await fetch(
+          `${API_BASE_URL}/workflow/${workflowId}/edges`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const dataEdges = await resEdges.json();
+
+        const fetchedEdges = dataEdges.map((edge) => ({
+          id: `e${edge.from_node_id}-${edge.to_node_id}`,
+          source: edge.from_node_id.toString(),
+          target: edge.to_node_id.toString(),
+          animated: true,
+        }));
         setEdges(fetchedEdges);
       } catch (err) {
         console.error("Error loading workflow:", err);
@@ -122,12 +124,11 @@ export default function GraphPage() {
       }
     };
 
-    fetchNodes();
-  }, [workflowId, token, setNodes, setEdges]);
+    fetchWorkflow();
+  }, [workflowId, token, setNodes, setEdges, navigate]);
 
   const handleAddNode = useCallback(async () => {
     if (!workflowId || !token) return;
-
     const newNodeId = nodes.length + 1;
     const newNode = {
       id: newNodeId,
