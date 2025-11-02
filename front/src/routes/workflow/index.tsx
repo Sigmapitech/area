@@ -42,7 +42,7 @@ export default function GraphPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const [indivNode, setNode] = useState<WorkflowNode>({
+  const [_indivNode, _setNode] = useState<WorkflowNode>({
     id: 0,
     node_id: null,
     key: "",

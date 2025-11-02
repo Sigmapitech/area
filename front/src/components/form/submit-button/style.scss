@@ -1,0 +1,15 @@
+.btn {
+  width: 100%;
+  border: 2px solid transparent;
+  padding: .5rem;
+  color: black;
+
+  &:hover, &:focus-visible {
+    background: #E4BEF8;
+    outline: none;
+  }
+
+  &-validate {
+    background: #c174f2;
+  }
+}

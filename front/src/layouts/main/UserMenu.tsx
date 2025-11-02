@@ -26,11 +26,14 @@ export default function UserMenu({
 }: UserMenuProps) {
   const { logout } = useAuth();
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setMenuVisible(false);
-    }
-  }, []);
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuVisible(false);
+      }
+    },
+    [menuRef.current, setMenuVisible]
+  );
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
