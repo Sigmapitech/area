@@ -128,10 +128,7 @@ export default function RegisterPage() {
           <FormSubmitButton value="Sign up" />
         </div>
         <div className="info">
-          <p>Already have an account?</p>
-          <Link className="btn btn-login" to="/login">
-            Login
-          </Link>
+          <Link to="/login">already have an account?</Link>
         </div>
       </form>
     </div>

@@ -6,7 +6,7 @@ import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
 export default function ProfilePage() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -127,6 +127,9 @@ export default function ProfilePage() {
 
           <button type="submit">Update Profile</button>
         </form>
+        <button type="button" onClick={logout}>
+          Logout
+        </button>
       </div>
     </div>
   );
