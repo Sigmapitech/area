@@ -1,8 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AuthProvider, LoginRequired } from "@/auth";
+import MainLayout from "@/layouts/main";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
 import TestSpotifyPage from "@/routes/test-spotify";
+import GraphPage from "@/routes/workflow";
+import WorkflowList from "@/routes/workflow-create";
 import { CheckAPIConnection } from "./api-guard";
 
 function MobileApp() {
@@ -13,8 +16,12 @@ function MobileApp() {
           <Route path="/" element={<CheckAPIConnection />} />
           <Route path="/login" element={<LoginPage />} />
           <Route element={<LoginRequired />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/test-spotify" element={<TestSpotifyPage />} />
+            <Route element={<MainLayout />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/graph" element={<WorkflowList />} />
+              <Route path="/test-spotify" element={<TestSpotifyPage />} />
+            </Route>
+            <Route path="/graph/:id" element={<GraphPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
