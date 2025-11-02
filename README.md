@@ -45,9 +45,52 @@ The system is composed of three main parts:
 ### Installation
 
 - **Step 1**: Connect your phone with your laptop via a cable
-- **Step 2**: docker-compose build && docker-compose up
+- **Step 2**: docker build -t test -f android/Dockerfile . && docker run test:latest
 - **Step 3**: Go to your browser -> connect to http://localhost:8081/ to be at the web interface
-- **Step 4**:Connect to http://localhost:8081/client.apk to download the mobile app
+- **Step 4**: Connect to http://localhost:8081/client.apk to download the mobile app
+
+#### Mobile installation
+
+- **Step 1**: Go to front/android and create a \`gradle.properties\` file. Fill it with those informations:
+
+\# Project-wide Gradle settings.
+
+\# IDE (e.g. Android Studio) users:
+\# Gradle settings configured through the IDE *will override*
+\# any settings specified in this file.
+
+\# For more details on how to configure your build environment visit
+\# http://www.gradle.org/docs/current/userguide/build_environment.html
+
+\# Specifies the JVM arguments used for the daemon process.
+\# The setting is particularly useful for tweaking memory settings.
+org.gradle.jvmargs=-Xmx1536m
+
+\# When configured, Gradle will run in incubating parallel mode.
+\# This option should only be used with decoupled projects. More details, visit
+\# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+\# org.gradle.parallel=true
+
+\# AndroidX package structure to make it clearer which packages are bundled with the
+\# Android operating system, and which are packaged with your app's APK
+\# https://developer.android.com/topic/libraries/support-library/androidx-rn
+android.useAndroidX=true
+RELEASE_STORE_FILE=/build/apk_key.jks
+RELEASE_STORE_PASSWORD=xxxxxx
+RELEASE_KEY_ALIAS=alias
+RELEASE_KEY_PASSWORD=xxxxxx
+
+Replace both of the "xxxxxx" with an actual password. That password need to be at least 6 characters long.
+
+- **Step 2**: In your terminal run `keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;`.
+It will ask for a keystore password, put the one you chose for the first step. It will follow by asking more information; those information don't need to be necesarilly true.
+Enter 'y' to confirm the datas you entered.
+
+- **Step 3**: run `docker build -t test -f android/Dockerfile . && docker run test:latest`.
+
+- **Step 4**: Connect to http://localhost:8081/client.apk to download the mobile app.
+
+
 
 ### Services
 
@@ -95,3 +138,10 @@ WIP
 ## 📖 Documentation
 
 - **API**: http://localhost:8080/docs
+
+keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;
+
+RELEASE_STORE_FILE=/build/apk_key.jks
+RELEASE_STORE_PASSWORD=xxxx
+RELEASE_KEY_ALIAS=alias
+RELEASE_KEY_PASSWORD=xxxx
