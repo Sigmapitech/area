@@ -108,11 +108,12 @@ WIP
 
 ## 🛠 Contributing
 
-### Languages and framework
+### Languages, frameworks and technologies
 
 - Web App: React + SCSS
 - Mobile App: React + Capacitor + SCSS
 - Server: Python + fastapi
+- Environment: Nix + Docker
 
 ### How to add a service
 
