@@ -1,13 +1,30 @@
 .service {
   &-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
     box-sizing: border-box;
     width: 100%;
     display: flex;
     flex-direction: column;
     padding: 1em;
 
-    p {
+    h1, p {
       margin: 0;
+    }
+
+    &.dimmed {
+      opacity: 0.6;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    &-refresh {
+      transition: background 0.2s ease;
+
+      &[disabled] {
+        background: #11111b;
+      }
     }
   }
 
@@ -50,4 +67,8 @@
     width: 100%;
     overflow-y: auto;
   }
+}
+
+.connected-tag {
+  font-size: .8rem;
 }

@@ -1,6 +1,6 @@
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 
@@ -19,10 +19,12 @@ export default function ConnectServicesPage() {
   const [services, setServices] = useState<Record<string, string>>({});
   const [connected, setConnected] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = useCallback(
+    async (isInitial = false) => {
       try {
+        if (isInitial) setLoading(true);
         const [servicesRes, meRes] = await Promise.all([
           fetch(`${API_BASE_URL}/services`),
           fetch(`${API_BASE_URL}/auth/me`, {
@@ -40,11 +42,21 @@ export default function ConnectServicesPage() {
       } catch (err) {
         console.error("Failed to fetch services:", err);
       } finally {
-        setLoading(false);
+        if (isInitial) setLoading(false);
+        setRefreshing(false);
       }
-    };
-    fetchData();
-  }, [token]);
+    },
+    [token]
+  );
+
+  useEffect(() => {
+    fetchData(true);
+  }, [fetchData]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData(false); // don’t trigger global loading
+  };
 
   const handleConnect = (service: string) => {
     const connectUrl = `${API_BASE_URL}/${service}/connect?token=${token}&platform=${__APP_PLATFORM__}`;
@@ -82,8 +94,18 @@ export default function ConnectServicesPage() {
   if (loading) return <div>Loading services...</div>;
 
   return (
-    <div className="service-page">
-      <h1>services</h1>
+    <div className={`service-page ${refreshing ? "dimmed" : ""}`}>
+      <h1>Services</h1>
+      <div>
+        <button
+          className="service-page-refresh"
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          Refresh
+        </button>
+      </div>
+
       <div className="service-list">
         {Object.entries(services).map(([name, svg]) => {
           const isConnected = connected[name] ?? false;
@@ -99,6 +121,7 @@ export default function ConnectServicesPage() {
               {!isConnected && (
                 <button onClick={() => handleConnect(name)}>Connect</button>
               )}
+              {isConnected && <span className="connected-tag">Connected</span>}
             </div>
           );
         })}

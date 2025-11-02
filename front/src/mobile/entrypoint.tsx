@@ -16,8 +16,9 @@ function MobileApp() {
         <Routes>
           <Route path="/" element={<CheckAPIConnection />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route element={<LoginRequired />}>
-            <Route element={<MainLayout />}>
+          <Route element={<MainLayout />}>
+            <Route element={<LoginRequired />}>
+              <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/graph" element={<WorkflowList />} />
               <Route path="/test-spotify" element={<TestSpotifyPage />} />
