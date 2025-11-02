@@ -1,3 +1,6 @@
-from .base import Base, get_session, init_db
+from .base import get_session, init_db
 
-__all__ = ("Base", "get_session", "init_db")
+__all__ = (
+    "get_session",
+    "init_db",
+)

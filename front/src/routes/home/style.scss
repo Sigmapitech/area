@@ -1,9 +1,13 @@
 .home-page {
-  padding: 2em;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 1em;
 
   .buttons {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 1em;
   }
 }

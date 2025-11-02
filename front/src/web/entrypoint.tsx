@@ -1,12 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-
 import { AuthProvider, LoginRequired } from "@/auth";
-
-import "@/index.scss";
-
-import GraphPage from "@/routes/graph";
+import MainLayout from "@/layouts/main";
+import ConnectServicesPage from "@/routes/connect-services";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
+import ProfilePage from "@/routes/profile";
+import RegisterPage from "@/routes/register";
+import GraphPage from "@/routes/workflow";
+import WorkflowList from "@/routes/workflow-create";
 
 function WebApp() {
   return (
@@ -14,9 +15,15 @@ function WebApp() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<LoginRequired />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/graph" element={<GraphPage />} />
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/workflow" element={<WorkflowList />} />
+              <Route path="/workflow/:workflowId" element={<GraphPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/services" element={<ConnectServicesPage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

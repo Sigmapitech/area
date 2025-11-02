@@ -9,11 +9,16 @@ description = "A modular workflow runner with FastAPI, SQLAlchemy, and MariaDB"
 license = { text = "BSD-3-Clause" }
 requires-python = ">=3.12"
 dependencies = [
+  "bcrypt==4.3.0",
+  "email-validator",
   "fastapi",
-  "uvicorn[standard]",
-  "sqlalchemy[asyncio]",
+  "httpx",
+  "passlib",
   "pydantic",
-  "passlib[bcrypt]",
+  "pyjwt",
+  "sqlalchemy[asyncio]",
+  "sqlmodel",
+  "uvicorn[standard]",
 ]
 
 [project.scripts]
@@ -22,7 +27,15 @@ area = "app.main:main"
 [project.optional-dependencies]
 dev = [
   "black",
-  "isort"
+  "isort",
+]
+testing = [
+  "aiosqlite",
+  "pytest",
+  "pytest-cov",
+  "pytest-env",
+  "pytest-xdist",
+  "pytest-asyncio",
 ]
 
 [tool.hatch.build.targets.wheel]

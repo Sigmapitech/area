@@ -1,0 +1,15 @@
+comment:
+  layout: "header, files, footer"
+  hide_project_coverage: false
+
+coverage:
+  status:
+    project:
+      default: false
+      api:
+        target: 70
+        paths:
+          - "back/app"
+          - "!back/app/routes"
+    patch:
+      default: false

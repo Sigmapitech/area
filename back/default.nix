@@ -9,14 +9,20 @@ python3Packages.buildPythonApplication {
 
   src = ./.;
 
-  build-system = [ python3Packages.hatchling ];
+  build-system = [python3Packages.hatchling];
 
   dependencies = with python3Packages; [
-    fastapi
-    uvicorn
-    sqlalchemy
-    passlib
     aiosqlite
+    bcrypt
+    email-validator
+    fastapi
+    httpx
+    pyjwt
+    passlib
+    sqlalchemy
+    sqlmodel
+    uvicorn
+    httpx
   ];
 
   optional-dependencies = with python3Packages; {
@@ -25,12 +31,26 @@ python3Packages.buildPythonApplication {
       black
       isort
     ];
+    testing = [
+      pytest
+      pytest-env
+      pytest-cov
+      pytest-xdist
+      pytest-asyncio
+    ];
   };
+
+  nativeCheckInputs = with python3Packages; [
+    pytestCheckHook
+    pytest-env
+    pytest-cov-stub
+    pytest-asyncio
+  ];
 
   meta = {
     description = "Modular workflow runner with FastAPI, SQLAlchemy, and MariaDB";
     license = lib.licenses.bsd3;
-    maintainers = with lib.maintainers; [ sigmanificient ];
+    maintainers = with lib.maintainers; [sigmanificient];
     mainProgram = "area";
   };
 }

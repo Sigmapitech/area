@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from ...schemas import SimpleMessage
+from ..schemas import SimpleMessage
 
 router = APIRouter(prefix="/hello")
 
@@ -14,6 +14,7 @@ router = APIRouter(prefix="/hello")
     description="Dummy endpoint that reply a greeting",
     responses={
         HTTPStatus.OK: {
+            "model": SimpleMessage,
             "content": {
                 "application/json": {
                     "example": SimpleMessage(
