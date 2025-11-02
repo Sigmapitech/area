@@ -7,6 +7,7 @@ import LoginPage from "@/routes/login";
 import GraphPage from "@/routes/workflow";
 import WorkflowList from "@/routes/workflow-create";
 import { CheckAPIConnection } from "./api-guard";
+import ProfilePage from "@/routes/profile";
 
 function MobileApp() {
   return (
@@ -22,6 +23,7 @@ function MobileApp() {
               <Route path="/graph" element={<WorkflowList />} />
               <Route path="/graph/:id" element={<GraphPage />} />
               <Route path="/services" element={<ConnectServicesPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
           </Route>
         </Routes>
