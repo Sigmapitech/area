@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AuthProvider, LoginRequired } from "@/auth";
 import HomePage from "@/routes/home";
@@ -10,10 +9,6 @@ import { CheckAPIConnection } from "./api-guard";
 import MainLayout from "@/layouts/main";
 
 function MobileApp() {
-  const [open, setOpen] = useState(false);
-  const node = useRef<HTMLDivElement>(null);
-  useOnClickOutside(node, () => setOpen(false));
-
   return (
     <AuthProvider>
       <BrowserRouter>

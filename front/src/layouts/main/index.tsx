@@ -7,7 +7,7 @@ import { Link, Outlet } from "react-router";
 import { API_BASE_URL } from "@/api_url";
 import { useAuth } from "@/auth";
 import UserMenu from "./UserMenu";
-import Burger from "@/mobile/composant/burger-menu";
+import Burger, { useOnClickOutside } from "@/mobile/composant/burger-menu";
 
 export default function MainLayout() {
   const { token } = useAuth();
@@ -36,6 +36,8 @@ export default function MainLayout() {
   }, [token]);
 
   const [openBurger, setOpenBurger] = useState(false);
+  const node = useRef<HTMLDivElement>(null);
+  useOnClickOutside(node, () => setOpenBurger(false));
 
   return (
     <div className="main">
