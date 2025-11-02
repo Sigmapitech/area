@@ -2,13 +2,13 @@ interface SubmitOptions<T> {
   url: string;
   method?: "POST" | "GET" | "PUT" | "DELETE";
   body: T;
-  onSuccess: (data: any) => void;
-  onError?: (error: any) => void;
+  onSuccess: (data) => void;
+  onError?: (error) => void;
 }
 
-function handleSubmitError(error: any): string {
+function handleSubmitError(error): string {
   if (Array.isArray(error.detail)) {
-    return error.detail.map((e: any) => e.msg || JSON.stringify(e)).join(", ");
+    return error.detail.map((e) => e.msg || JSON.stringify(e)).join(", ");
   }
 
   if (typeof error.detail === "string") {
@@ -42,7 +42,7 @@ export async function handleFormSubmit<T>({
       const data = await response.json();
       onSuccess(data);
     }
-  } catch (err: any) {
+  } catch (err) {
     onError?.(err.detail || err.message || "error");
   }
 }

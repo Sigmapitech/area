@@ -1,4 +1,4 @@
-import type { FormEvent, ChangeEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -46,7 +46,7 @@ export default function RegisterPage() {
       type: "password",
       placeholder: "Password",
       pattern:
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$",
       title:
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
     },
@@ -56,7 +56,7 @@ export default function RegisterPage() {
       type: "password",
       placeholder: "Confirm Password",
       pattern:
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$",
       title:
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
     },

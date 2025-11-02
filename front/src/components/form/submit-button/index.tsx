@@ -14,7 +14,7 @@ export default function FormSubmitButton({
   onClick,
 }: FormSubmitButtonProps) {
   return (
-    <button type="submit" className={"btn " + className} onClick={onClick}>
+    <button type="submit" className={`btn ${className}`} onClick={onClick}>
       {value}
     </button>
   );
