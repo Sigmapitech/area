@@ -118,27 +118,6 @@ WIP
 
 ---
 
-## 🛠 Contributing
-
-### Languages and frameworks
-
-- Web App: React + SCSS
-- Mobile App: React + Capacitor + SCSS
-- Server: Python + fastapi
-
-### How to add a service
-
-- Go to area/back/app/routes
-- Add a folder and name it after the service you want to add
-- Create a `__init__.py` file following other examples
-- Create the .py file for the service and complete it following the other examples
-
-### How to add an A-REA
-
-WIP
-
----
-
 ## 📅 Project Timeline
 
 - **21/09/2025**: Tech stack selection, PoC, task distribution.
