@@ -44,9 +44,26 @@ The system is composed of three main parts:
 
 ### Installation
 
-#### Mobile installation
+ - **Step 1**: Go to back and a create a \`config.toml\` file. Fill it with:
 
-- **Step 1**: Go to front/android and create a \`gradle.properties\` file. Fill it with those informations:
+[security]
+jwt_secret = "hello_world_3301@083280948390"
+
+[db]
+uri="sqlite+aiosqlite:///app.db"
+
+[providers]
+
+[providers.discord]
+client_id = id_exemple #1418965246885761106
+client_secret = secret_example #"JgGHjCxByc56UweRxbS978hWq9tpRbs4"
+
+[providers.github]
+\# ...
+
+In the providers, replace the client_id and client_secret with your client_id and client_secret. Repeat for every provider. (They can be found in back/app/routes)
+
+- **Step 2**: Go to front/android and create a \`gradle.properties\` file. Fill it with those informations:
 
 \# Project-wide Gradle settings.
 
@@ -77,13 +94,13 @@ RELEASE_KEY_PASSWORD=xxxxxx
 
 Replace both of the "xxxxxx" with an actual password. That password need to be at least 6 characters long.
 
-- **Step 2**: In your terminal run `keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;`.
+- **Step 3**: In your terminal run `keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;`.
 It will ask for a keystore password, put the one you chose for the first step. It will follow by asking more information; those information don't need to be necesarilly true.
 Enter 'y' to confirm the datas you entered.
 
-- **Step 3**: run `docker build -t test -f android/Dockerfile . && docker run test:latest`.
+- **Step 4**: run `docker build -t test -f android/Dockerfile . && docker run test:latest`.
 
-- **Step 4**: Connect to http://localhost:8081/client.apk to download the mobile app.
+- **Step 5**: Connect to http://localhost:8081/client.apk to download the mobile app.
 
 
 
