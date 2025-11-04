@@ -44,7 +44,12 @@ The system is composed of three main parts:
 
 ### Installation
 
- - **Step 1**: Go to back and a create a \`config.toml\` file. Fill it based on the data in exemples/exemple_config. In the provider section, replace the client_id and client_secret with your client_id and client_secret. Repeat for every provider. (They can be found in back/app/routes)
+ - **Step 1**: Go to back and a create a \`config.toml\` file. Fill it based on the data in exemples/exemple_config:
+    The `jwt_secret` is an ascii string.
+    For each routes fill the `client_id` and `client_secret` with your own.
+    Note for caldav/gmail/youtube, use the same `client_id`/`client_secret`. The `client_id` must finish with `.apps.googleusercontent.com`.
+
+ In the provider section, replace the client_id and client_secret with your client_id and client_secret. Repeat for every provider. (They can be found in back/app/routes)
 
 - **Step 2**: Go to front/android and create a \`gradle.properties\` file. Fill it with the informations in exemples/exemple_gradle. Fill `RELEASE_STORE_PASSWORD` and `RELEASE_KEY_PASSWORD` with your own password. The two must have an identical one.
 
