@@ -21,7 +21,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     inherit (finalAttrs) pname src;
 
     fetcherVersion = 2;
-    hash = "sha256-FSQA/Li1XsqQwwosbItC42e1OjCN0soe4Yhn3Od7frA=";
+    hash = "sha256-igUdfQtmFH8arU+dpLRBziJZ75108yq0kN5Jqf/Nuew=";
   };
 
   # using sass-embedded fails at executing dart-sass from node-modules

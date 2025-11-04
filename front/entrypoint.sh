@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Output dir
-OUTPUT_DIR=/app
+OUTPUT_DIR=/shared
 APK_NAME=client.apk
 
 # Ensure output folder exist

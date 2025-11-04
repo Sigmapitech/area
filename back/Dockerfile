@@ -21,10 +21,11 @@ FROM scratch
 # Copy /nix/store and the built result
 COPY --from=builder /tmp/nix-store-closure /nix/store
 COPY --from=builder /tmp/build/result /app
+COPY --from=builder /tmp/build/back/config.toml /app/config.toml
 
 # Expose server port and run
 ENV PORT=8080
 WORKDIR /app
 EXPOSE 8080
 # Pass "dev" to enable the CORS branch in app.main
-CMD ["/app/bin/area", "dev"]
+CMD ["/app/bin/area", "run"]
