@@ -1,0 +1,14 @@
+[security]
+jwt_secret = "hello_world_3301@083280948390"
+
+[db]
+uri="sqlite+aiosqlite:///app.db"
+
+[providers]
+
+[providers.discord]
+client_id = id_exemple #1418965246885761106
+client_secret = secret_example #"JgGHjCxByc56UweRxbS978hWq9tpRbs4"
+
+[providers.github]
+\# ...
