@@ -51,16 +51,13 @@ The system is composed of three main parts:
 
  In the provider section, replace the client_id and client_secret with your client_id and client_secret. Repeat for every provider. (They can be found in back/app/routes)
 
-- **Step 2**: Go to front/android and create a \`gradle.properties\` file. Fill it with the informations in exemples/exemple_gradle. Fill `RELEASE_STORE_PASSWORD` and `RELEASE_KEY_PASSWORD` with your own password. The two must have an identical one.
+- **Step 2**: Go to front and create a \`gradle.properties\` file. Fill it with the informations in exemples/exemple_gradle. Fill `RELEASE_STORE_PASSWORD` and `RELEASE_KEY_PASSWORD` with your own password. The two must have an identical one.
 
 - **Step 3**: In your terminal run `keytool -genkey -v -keystore apk_key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias alias;`.
 It will ask for a keystore password, put the one you chose for the second step. It will follow by asking more information; those information don't need to be necesarilly true.
 Enter 'y' to confirm the datas you entered.
 
-- **Step 4**: run `docker build -t test -f android/Dockerfile . && docker run test:latest`.
-
-- **Step 5**: Connect to http://localhost:8081/client.apk to download the mobile app.
-
+- **Step 4**: Run `docker compose up --build`
 
 
 ### Services
