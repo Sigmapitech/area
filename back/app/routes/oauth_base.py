@@ -44,12 +44,7 @@ class OAuthProvider:
 
     services = {}
 
-    def __init__(
-        self,
-        icon: str,
-        package: str | None,
-        config_model: Any
-    ):
+    def __init__(self, icon: str, package: str | None, config_model: Any):
         assert package is not None, "Package name must be provided"
 
         *_, service_name = package.split(".")
@@ -293,6 +288,7 @@ class OAuthProvider:
 
 
 router = APIRouter(prefix="/services", tags=["services"])
+
 
 @router.get("", response_model=dict[str, str])
 async def get_service_list():

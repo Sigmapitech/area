@@ -64,7 +64,7 @@ async def login_user(
     },
 )
 async def get_me(
-    current_user = Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ) -> UserSchema:
     connected_services = {token.service: True for token in current_user.tokens}
 
@@ -72,6 +72,7 @@ async def get_me(
         **current_user.__dict__,
         services=connected_services,
     )
+
 
 @router.patch(
     "/credentials",

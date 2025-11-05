@@ -1,8 +1,9 @@
+import time
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from .oauth_base import OAuthProvider
-import time
 
 router = APIRouter(prefix="")
 
@@ -22,12 +23,11 @@ async def about_json(request: Request):
                 "services": [
                     {
                         "name": service_name,
-                        "actions": [
-                        ],
-                        "reactions": [
-                        ],
-                    } for service_name in services
-                ]
+                        "actions": [],
+                        "reactions": [],
+                    }
+                    for service_name in services
+                ],
             },
         }
     )
