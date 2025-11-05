@@ -1,27 +1,33 @@
-# Nix builder
-FROM nixos/nix:latest AS builder
+FROM node:22-bookworm-slim AS build
 
-# Copy our source and setup our working dir.
-COPY .. /tmp/build
-WORKDIR /tmp/build
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Build our Nix environment (front-web helper)
-RUN nix \
-    --extra-experimental-features "nix-command flakes" \
-    --option filter-syscalls false \
-    build .#front
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the Nix store closure into a directory.
-RUN mkdir /tmp/nix-store-closure
-RUN cp -R $(nix-store -qR result/) /tmp/nix-store-closure
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Final image is based on scratch.
-FROM scratch
+RUN npm install -g serve
 
-# Copy /nix/store and the built result
-COPY --from=builder /tmp/nix-store-closure /nix/store
-COPY --from=builder /tmp/build/result /app
+WORKDIR /app
 
-# Expose client_web port and run
-EXPOSE 8081
-CMD ["/app/bin/web"]
+COPY package.json pnpm-lock.yaml ./
+
+ENV CI=true
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+RUN pnpm build:web
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose to 80 and remap it in compose since nginx defaults to 80 without parameters possible
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

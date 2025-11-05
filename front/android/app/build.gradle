@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
   namespace "io.github.sigmapitech"
   compileSdk rootProject.ext.compileSdkVersion
+
   defaultConfig {
     applicationId "io.github.sigmapitech"
     minSdkVersion rootProject.ext.minSdkVersion
@@ -13,15 +14,26 @@ android {
       ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
   }
+
+  signingConfigs {
+    release {
+      storeFile file(RELEASE_STORE_FILE)
+      storePassword RELEASE_STORE_PASSWORD
+      keyAlias RELEASE_KEY_ALIAS
+      keyPassword RELEASE_KEY_PASSWORD
+    }
+  }
+
   buildTypes {
     release {
       minifyEnabled false
+      signingConfig signingConfigs.release
     }
   }
 }
 
 repositories {
-  flatDir{
+  flatDir {
     dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
   }
 }
