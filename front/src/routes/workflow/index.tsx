@@ -28,27 +28,25 @@ export default function GraphPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEdge, setSelectedEdge] = useState<any | null>(null);
+  const [deleteButtonPos, setDeleteButtonPos] = useState<{ x: number; y: number } | null>(null);
 
   const onConnect = useCallback(
     async (params: Connection) => {
-      setEdges((els) => addEdge(params, els));
       if (!workflowId || !token) return;
 
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/workflow/${workflowId}/edges`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              from_node_id: params.source,
-              to_node_id: params.target,
-            }),
-          }
-        );
+        const res = await fetch(`${API_BASE_URL}/workflow/${workflowId}/edges`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            from_node_id: params.source,
+            to_node_id: params.target,
+          }),
+        });
 
         if (!res.ok) {
           console.error("Failed to create edge:", res.statusText);
@@ -59,7 +57,7 @@ export default function GraphPage() {
         setEdges((eds) => [
           ...eds,
           {
-            id: `e${savedEdge.from_node_id}-${savedEdge.to_node_id}`,
+            id: savedEdge.id,
             source: savedEdge.from_node_id.toString(),
             target: savedEdge.to_node_id.toString(),
             animated: true,
@@ -72,6 +70,49 @@ export default function GraphPage() {
     [workflowId, token, setEdges]
   );
 
+  const onEdgeClick = useCallback(
+    (event, edge) => {
+      event.stopPropagation();
+      setSelectedEdge(edge);
+
+      const edgePath = event.target.getBoundingClientRect();
+      setDeleteButtonPos({
+        x: edgePath.left + edgePath.width / 2,
+        y: edgePath.top + edgePath.height / 2,
+      });
+    },
+    []
+  );
+
+  const handleDeleteEdge = useCallback(async () => {
+    if (!selectedEdge || !token) return;
+
+    try {
+      const edgeId = selectedEdge.id;
+
+      const res = await fetch(`${API_BASE_URL}/workflow/edges/${edgeId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        console.error("Failed to delete edge:", res.statusText);
+        return;
+      }
+
+      setEdges((eds) => eds.filter((e) => e.id !== selectedEdge.id));
+      setSelectedEdge(null);
+      setDeleteButtonPos(null);
+    } catch (err) {
+      console.error("Error deleting edge:", err);
+    }
+  }, [selectedEdge, token, setEdges]);
+
+  const onPaneClick = useCallback(() => {
+    setSelectedEdge(null);
+    setDeleteButtonPos(null);
+  }, []);
+
   useEffect(() => {
     const fetchWorkflow = async () => {
       if (!workflowId || !token) return;
@@ -83,10 +124,7 @@ export default function GraphPage() {
         });
         const dataNodes = await resNodes.json();
 
-        if (
-          resNodes.status === 404 &&
-          dataNodes.detail === "Workflow not found"
-        ) {
+        if (resNodes.status === 404 && dataNodes.detail === "Workflow not found") {
           navigate("/workflow", { replace: true });
           return;
         }
@@ -102,18 +140,16 @@ export default function GraphPage() {
         }));
         setNodes(fetchedNodes);
 
-        const resEdges = await fetch(
-          `${API_BASE_URL}/workflow/${workflowId}/edges`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const resEdges = await fetch(`${API_BASE_URL}/workflow/${workflowId}/edges`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         const dataEdges = await resEdges.json();
 
         const fetchedEdges = dataEdges.map((edge) => ({
-          id: `e${edge.from_node_id}-${edge.to_node_id}`,
-          source: edge.from_node_id.toString(),
-          target: edge.to_node_id.toString(),
+          id: edge.id,
+          source: edge.from_node_id,
+          target: edge.to_node_id,
           animated: true,
         }));
         setEdges(fetchedEdges);
@@ -157,7 +193,7 @@ export default function GraphPage() {
         ...nds,
         {
           ...newNode,
-          id: savedNode.id.toString(),
+          id: savedNode.id,
           data: { label: `Node ${savedNode.id}` },
         },
       ]);
@@ -169,7 +205,7 @@ export default function GraphPage() {
   if (loading) return <div className="info-loading">Loading workflow...</div>;
 
   return (
-    <main className="workflow-editor">
+    <main className="workflow-editor" onClick={onPaneClick}>
       <ReactFlowProvider>
         <ReactFlow
           colorMode="system"
@@ -178,12 +214,31 @@ export default function GraphPage() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onEdgeClick={onEdgeClick}
           fitView
         >
           <Background />
           <Controls />
         </ReactFlow>
       </ReactFlowProvider>
+
+      {deleteButtonPos && (
+        <button
+          className="delete-edge-btn"
+          style={{
+            position: "absolute",
+            top: deleteButtonPos.y - 20,
+            left: deleteButtonPos.x - 20,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteEdge();
+          }}
+        >
+          🗑️
+        </button>
+      )}
+
       <button
         type="button"
         className="btn add-node-btn"
