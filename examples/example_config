@@ -1,0 +1,54 @@
+[security]
+jwt_secret = ""
+
+[db]
+uri="sqlite+aiosqlite:///app.db"
+
+
+[routes.discord]
+client_id = ""
+client_secret = ""
+
+[routes.spotify]
+# scope = "user-read-email user-read-currently-playing user-follow-read"
+client_id = ""
+client_secret = ""
+
+[routes.gmail]
+# Provide your Google OAuth 2.0 Web client credentials
+# Ensure the redirect URI http://127.0.0.1:8080/gmail/auth is added in Google Cloud Console
+client_id = ""
+client_secret = ""
+# Optional: override scope or redirect URI here if needed
+# scope = "https://www.googleapis.com/auth/gmail.readonly openid email profile"
+# redirect_uri = "http://127.0.0.1:8080/gmail/auth"
+
+[routes.caldav]
+# Uses Google OAuth credentials (you can reuse the same client as Gmail/YouTube)
+# Add redirect URI: http://127.0.0.1:8080/caldav/auth
+client_id = ""
+client_secret = ""
+# Optional overrides
+# scope = "https://www.googleapis.com/auth/calendar.readonly openid email profile"
+# redirect_uri = "http://127.0.0.1:8080/caldav/auth"
+
+[routes.youtube]
+# Create OAuth credentials at https://console.cloud.google.com/apis/credentials
+# Add http://127.0.0.1:8080/youtube/auth as an authorized redirect URI
+client_id = "-."
+client_secret = ""
+# Optional overrides
+# scope = "https://www.googleapis.com/auth/youtube.readonly openid email profile"
+# redirect_uri = "http://127.0.0.1:8080/youtube/auth"
+
+[routes.reddit]
+# Create a Reddit app at https://www.reddit.com/prefs/apps
+# For local dev, use type: installed app (or web app) and add redirect URI:
+#   http://127.0.0.1:8080/reddit/auth
+# Note: Installed apps have no secret; keep client_secret empty. Web apps have a secret.
+client_id = ""
+client_secret = ""
+# Optional overrides:
+# scope = "identity read"
+# redirect_uri = "http://127.0.0.1:8080/reddit/auth"
+# resource_headers.User-Agent should be descriptive; override via code if needed
