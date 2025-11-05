@@ -27,11 +27,9 @@ export default function GraphPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedEdge, setSelectedEdge] = useState<any | null>(null);
-  const [deleteButtonPos, setDeleteButtonPos] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedEdge, setSelectedEdge] = useState(null);
 
   const onConnect = useCallback(
     async (params: Connection) => {
@@ -78,41 +76,58 @@ export default function GraphPage() {
   const onEdgeClick = useCallback((event, edge) => {
     event.stopPropagation();
     setSelectedEdge(edge);
-
-    const edgePath = event.target.getBoundingClientRect();
-    setDeleteButtonPos({
-      x: edgePath.left + edgePath.width / 2,
-      y: edgePath.top + edgePath.height / 2,
-    });
+    setSelectedNode(null);
   }, []);
 
-  const handleDeleteEdge = useCallback(async () => {
-    if (!selectedEdge || !token) return;
+  const onNodeClick = useCallback((event, node) => {
+    event.stopPropagation();
+    setSelectedNode(node);
+    setSelectedEdge(null);
+  }, []);
+
+  const handleDeleteSelected = useCallback(async () => {
+    if (!token) return;
 
     try {
-      const edgeId = selectedEdge.id;
+      if (selectedNode) {
+        const nodeId = selectedNode.id;
+        const res = await fetch(`${API_BASE_URL}/workflow/nodes/${nodeId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const res = await fetch(`${API_BASE_URL}/workflow/edges/${edgeId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        if (!res.ok) {
+          console.error("Failed to delete node:", res.statusText);
+          return;
+        }
 
-      if (!res.ok) {
-        console.error("Failed to delete edge:", res.statusText);
-        return;
+        setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+        setSelectedNode(null);
       }
 
-      setEdges((eds) => eds.filter((e) => e.id !== selectedEdge.id));
-      setSelectedEdge(null);
-      setDeleteButtonPos(null);
+      if (selectedEdge) {
+        const edgeId = selectedEdge.id;
+        const res = await fetch(`${API_BASE_URL}/workflow/edges/${edgeId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          console.error("Failed to delete edge:", res.statusText);
+          return;
+        }
+
+        setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+        setSelectedEdge(null);
+      }
     } catch (err) {
-      console.error("Error deleting edge:", err);
+      console.error("Error deleting item:", err);
     }
-  }, [selectedEdge, token, setEdges]);
+  }, [selectedNode, selectedEdge, token, setNodes, setEdges]);
 
   const onPaneClick = useCallback(() => {
+    setSelectedNode(null);
     setSelectedEdge(null);
-    setDeleteButtonPos(null);
   }, []);
 
   useEffect(() => {
@@ -156,8 +171,8 @@ export default function GraphPage() {
 
         const fetchedEdges = dataEdges.map((edge) => ({
           id: edge.id,
-          source: edge.from_node_id,
-          target: edge.to_node_id,
+          source: edge.from_node_id.toString(),
+          target: edge.to_node_id.toString(),
           animated: true,
         }));
         setEdges(fetchedEdges);
@@ -213,6 +228,7 @@ export default function GraphPage() {
   if (loading) return <div className="info-loading">Loading workflow...</div>;
 
   return (
+    /* biome-ignore lint: this is not going to be possible */
     <main className="workflow-editor" onClick={onPaneClick}>
       <ReactFlowProvider>
         <ReactFlow
@@ -223,6 +239,7 @@ export default function GraphPage() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onEdgeClick={onEdgeClick}
+          onNodeClick={onNodeClick}
           fitView
         >
           <Background />
@@ -230,21 +247,16 @@ export default function GraphPage() {
         </ReactFlow>
       </ReactFlowProvider>
 
-      {deleteButtonPos && (
+      {(selectedNode || selectedEdge) && (
         <button
           type="button"
-          className="delete-edge-btn"
-          style={{
-            position: "absolute",
-            top: deleteButtonPos.y - 20,
-            left: deleteButtonPos.x - 20,
-          }}
+          className="delete-floating-btn"
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteEdge();
+            handleDeleteSelected();
           }}
         >
-          🗑️
+          🗑️ Delete
         </button>
       )}
 
