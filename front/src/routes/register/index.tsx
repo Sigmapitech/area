@@ -94,7 +94,7 @@ export default function RegisterPage() {
     }
 
     handleFormSubmit({
-      url: `${API_BASE_URL}/auth/register/`,
+      url: `${API_BASE_URL}/auth/register`,
       body: { email, name, password },
       onSuccess: (data) => {
         login(data.token);

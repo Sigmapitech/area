@@ -1,38 +1,45 @@
 services:
+  client_mobile:
+    build:
+      context: front
+      dockerfile: ./android/Dockerfile
+    volumes:
+      - shared-artifacts:/shared
+    # Optional: wait for a short while on first run to produce the APK
+    healthcheck:
+      test: ["CMD", "test", "-f", "/shared/client.apk"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
   server:
     build:
       context: .
       dockerfile: back/Dockerfile
+    networks:
+      - backToFront
     ports:
       - "8080:8080"
     working_dir: /app
-    volumes:
-      - ./back/config.toml:/app/config.toml:ro
-
-  # client_mobile:
-  #   build:
-  #     context: .
-  #     dockerfile: front/android/Dockerfile
-  #   volumes:
-  #     - shared-artifacts:/shared
-  #   # Optional: wait for a short while on first run to produce the APK
-  #   healthcheck:
-  #     test: ["CMD", "test", "-f", "/shared/client.apk"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 30
 
   client_web:
     build:
-      context: .
-      dockerfile: front/Dockerfile
+      context: front
+      dockerfile: ./Dockerfile
     depends_on:
-
       server:
         condition: service_started
+      client_mobile:
+        condition: service_completed_successfully
+    networks:
+      - backToFront
     ports:
-      - "8081:8081"
+      - "8081:80"
     volumes:
-      - ./shared-artifacts:/app/share/www
+      - shared-artifacts:/shared/:ro
 
+volumes:
+  shared-artifacts:
 
+networks:
+  backToFront:

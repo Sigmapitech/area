@@ -57,7 +57,7 @@ export default function LoginPage() {
     const { email, password } = formData;
 
     handleFormSubmit({
-      url: `${API_BASE_URL}/auth/login/`,
+      url: `${API_BASE_URL}/auth/login`,
       body: { email, password },
       onSuccess: (data) => {
         login(data.token);
