@@ -172,7 +172,7 @@ class OAuthProvider:
         tokens = resp.json()
 
         token = OAuthToken(
-            user_id=user.id,
+            owner_id=user.id,
             service=self.cfg.service,
             access_token=tokens.get("access_token"),
             refresh_token=tokens.get("refresh_token"),
