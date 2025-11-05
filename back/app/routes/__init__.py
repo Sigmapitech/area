@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 routers = []
 providers = (
+    "about",
     "auth",
     "hello",
     "workflow",
