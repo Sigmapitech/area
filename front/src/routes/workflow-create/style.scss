@@ -41,7 +41,22 @@
       outline: none;
     }
   }
+}
 
+.workflow-card {
+  input {
+    background-color: #313244;
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #585b70;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #96bfff;
+      outline: none;
+    }
+  }
 }
 
 .workflow-items {

@@ -10,24 +10,32 @@ class Service:
 
     def action(self, name: str, description: str):
         """Decorator to register an action with metadata."""
+
         def wrapper(func: Callable):
-            self.actions.append({
-                "name": name,
-                "description": description,
-                "function": func,
-            })
+            self.actions.append(
+                {
+                    "name": name,
+                    "description": description,
+                    "function": func,
+                }
+            )
             return func
+
         return wrapper
 
     def reaction(self, name: str, description: str):
         """Decorator to register a reaction with metadata."""
+
         def wrapper(func: Callable):
-            self.reactions.append({
-                "name": name,
-                "description": description,
-                "function": func,
-            })
+            self.reactions.append(
+                {
+                    "name": name,
+                    "description": description,
+                    "function": func,
+                }
+            )
             return func
+
         return wrapper
 
     def to_dict(self) -> dict[str, Any]:

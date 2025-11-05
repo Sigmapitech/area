@@ -17,6 +17,8 @@ export default function WorkflowList() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [newWorkflow, setNewWorkflow] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingData, setEditingData] = useState({ name: "", description: "" });
 
   const createNewWorkflow = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,13 +62,46 @@ export default function WorkflowList() {
     }
   };
 
+  const startEditing = (workflow: Workflow) => {
+    setEditingId(workflow.id);
+    setEditingData({
+      name: workflow.name,
+      description: workflow.description || "",
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingData({ name: "", description: "" });
+  };
+
+  const saveEditing = async (id: number) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/workflow/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editingData),
+      });
+      if (!response.ok) throw new Error("Failed to update workflow");
+
+      const updated = await response.json();
+      setWorkflows((prev) => prev.map((w) => (w.id === id ? updated : w)));
+      cancelEditing();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update workflow");
+    }
+  };
+
   useEffect(() => {
     fetch(`${API_BASE_URL}/workflow`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setWorkflows(data);
         setLoading(false);
       })
@@ -107,20 +142,75 @@ export default function WorkflowList() {
           {workflows.map((workflow) => (
             <li className="workflow-card" key={workflow.id}>
               <div className="workflow-card__main">
-                <h3>{workflow.name}</h3>
-                <p>{workflow.description || "No description"}</p>
+                {editingId === workflow.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editingData.name}
+                      onChange={(e) =>
+                        setEditingData((d) => ({ ...d, name: e.target.value }))
+                      }
+                    />
+                    <input
+                      type="text"
+                      value={editingData.description}
+                      onChange={(e) =>
+                        setEditingData((d) => ({
+                          ...d,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    <h3>{workflow.name}</h3>
+                    <p>{workflow.description || "No description"}</p>
+                  </>
+                )}
               </div>
               <div className="workflow-card__actions">
-                <Link to={`/workflow/${workflow.id}`} className="btn view-btn">
-                  View
-                </Link>
-                <button
-                  type="button"
-                  className="btn delete-btn"
-                  onClick={() => deleteWorkflow(workflow.id)}
-                >
-                  Delete
-                </button>
+                {editingId === workflow.id ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn save-btn"
+                      onClick={() => saveEditing(workflow.id)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      className="btn cancel-btn"
+                      onClick={cancelEditing}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to={`/workflow/${workflow.id}`}
+                      className="btn view-btn"
+                    >
+                      View
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn edit-btn"
+                      onClick={() => startEditing(workflow)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn delete-btn"
+                      onClick={() => deleteWorkflow(workflow.id)}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </div>
             </li>
           ))}

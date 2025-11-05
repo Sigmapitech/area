@@ -4,6 +4,7 @@ import MainLayout from "@/layouts/main";
 import ConnectServicesPage from "@/routes/connect-services";
 import HomePage from "@/routes/home";
 import LoginPage from "@/routes/login";
+import NotFoundPage from "@/routes/not-found";
 import ProfilePage from "@/routes/profile";
 import RegisterPage from "@/routes/register";
 import GraphPage from "@/routes/workflow";
@@ -23,6 +24,7 @@ function WebApp() {
               <Route path="/workflow/:workflowId" element={<GraphPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/services" element={<ConnectServicesPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>
         </Routes>

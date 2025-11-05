@@ -44,12 +44,7 @@ class OAuthProvider:
 
     services = {}
 
-    def __init__(
-        self,
-        icon: str,
-        package: str | None,
-        config_model: Any
-    ):
+    def __init__(self, icon: str, package: str | None, config_model: Any):
         assert package is not None, "Package name must be provided"
 
         *_, service_name = package.split(".")
@@ -172,7 +167,7 @@ class OAuthProvider:
         tokens = resp.json()
 
         token = OAuthToken(
-            user_id=user.id,
+            owner_id=user.id,
             service=self.cfg.service,
             access_token=tokens.get("access_token"),
             refresh_token=tokens.get("refresh_token"),
@@ -293,6 +288,7 @@ class OAuthProvider:
 
 
 router = APIRouter(prefix="/services", tags=["services"])
+
 
 @router.get("", response_model=dict[str, str])
 async def get_service_list():

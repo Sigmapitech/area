@@ -12,7 +12,7 @@ class OAuthToken(Base):
     access_token = Column(String(128), nullable=False)
     refresh_token = Column(String(128), nullable=True)
 
-    service_id = Column(Integer, ForeignKey("service.id"), nullable=False)
+    service = Column(String, nullable=False)
 
     scope = Column(String(512), nullable=True)
     expires_at = Column(DateTime, nullable=True)
